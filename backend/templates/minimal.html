@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{name}} – Resume</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Calibri', 'Carlito', 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #000;
+      background: #fff;
+      width: 8.5in;
+      min-height: 11in;
+      padding: 0.5in;
+      line-height: 1.35;
+    }
+    .header { text-align: center; margin-bottom: 8px; }
+    .header h1 { font-size: 22pt; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    .header .contact-line { font-size: 10pt; color: #000; }
+    .header .contact-line a { color: #000; text-decoration: underline; }
+    .sep { margin: 0 5px; }
+    .section { margin-top: 10px; }
+    .section-title { font-size: 11.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #000; padding-bottom: 2px; margin-bottom: 6px; }
+    .summary-text { font-size: 10.5pt; line-height: 1.6; }
+    .subheading { margin-bottom: 5px; }
+    .subheading-row1, .subheading-row2 { display: flex; justify-content: space-between; align-items: baseline; }
+    .subheading-row1 .left { font-weight: 700; font-size: 11pt; }
+    .subheading-row1 .right { font-size: 10.5pt; }
+    .subheading-row2 .left { font-style: italic; font-size: 10pt; }
+    .subheading-row2 .right { font-style: italic; font-size: 10pt; }
+    ul.resume-bullets { margin-left: 18px; margin-top: 3px; }
+    ul.resume-bullets li { font-size: 10.5pt; line-height: 1.5; margin-bottom: 2px; list-style-type: disc; }
+    ul.resume-bullets li a { color: #000; text-decoration: underline; }
+    .project-heading { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+    .project-heading .left { font-size: 10.5pt; }
+    .project-heading .right { font-size: 10.5pt; }
+    .skill-list { list-style: none; padding: 0; margin: 0; }
+    .skill-list li { font-size: 10.5pt; line-height: 1.6; }
+    .skill-list li strong { font-weight: 700; }
+    .mt4 { margin-top: 4px; }
+    .mt6 { margin-top: 6px; }
+    .mt8 { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{name}}</h1>
+  <div class="contact-line">
+    {{phone}}
+    <span class="sep">|</span>
+    <a href="mailto:{{email}}">{{email}}</a>
+    {{#if linkedin}}<span class="sep">|</span><a href="{{linkedin}}" target="_blank">LinkedIn</a>{{/if}}
+    {{#if github}}<span class="sep">|</span><a href="{{github}}" target="_blank">GitHub</a>{{/if}}
+    {{#if portfolio}}<span class="sep">|</span><a href="{{portfolio}}" target="_blank">Portfolio</a>{{/if}}
+  </div>
+</div>
+
+{{#if summary}}
+<div class="section">
+  <div class="section-title">Professional Summary</div>
+  <p class="summary-text">{{summary}}</p>
+</div>
+{{/if}}
+
+{{#if education.length}}
+<div class="section">
+  <div class="section-title">Education</div>
+  {{#each education}}
+  <div class="subheading {{#unless @first}}mt6{{/unless}}">
+    <div class="subheading-row1">
+      <span class="left">{{institution}}</span>
+      <span class="right">{{location}}</span>
+    </div>
+    <div class="subheading-row2">
+      <span class="left">{{degree}}</span>
+      <span class="right">{{dates}}</span>
+    </div>
+  </div>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if experience.length}}
+<div class="section">
+  <div class="section-title">Experience</div>
+  {{#each experience}}
+  <div class="subheading {{#unless @first}}mt6{{/unless}}">
+    <div class="subheading-row1">
+      <span class="left">{{title}}</span>
+      <span class="right">{{location}}</span>
+    </div>
+    <div class="subheading-row2">
+      <span class="left">{{company}}</span>
+      <span class="right">{{dates}}</span>
+    </div>
+  </div>
+  <ul class="resume-bullets">
+    {{#each bullets}}<li>{{this}}</li>{{/each}}
+  </ul>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if projects.length}}
+<div class="section">
+  <div class="section-title">Projects</div>
+  {{#each projects}}
+  <div class="project-heading {{#unless @first}}mt6{{/unless}}">
+    <span class="left"><strong>{{name}}</strong> &nbsp;|&nbsp; <em>{{tech}}</em></span>
+    <span class="right">{{date}}</span>
+  </div>
+  <ul class="resume-bullets">
+    {{#each bullets}}<li>{{this}}</li>{{/each}}
+    {{#if live}}<li><a href="{{live}}" target="_blank">Live</a>{{#if github}} &nbsp;|&nbsp; <a href="{{github}}" target="_blank">GitHub</a>{{/if}}</li>{{/if}}
+  </ul>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if skills.categories.length}}
+<div class="section">
+  <div class="section-title">Technical Skills</div>
+  <ul class="skill-list">
+    {{#each skills.categories}}<li><strong>{{label}}</strong>: {{items}}</li>{{/each}}
+  </ul>
+</div>
+{{/if}}
+
+{{#if certifications.length}}
+<div class="section">
+  <div class="section-title">Certifications</div>
+  <ul class="skill-list">
+    {{#each certifications}}<li><strong>{{name}}</strong>{{#if issuer}}: {{issuer}}{{/if}}</li>{{/each}}
+  </ul>
+</div>
+{{/if}}
+
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{name}} – Resume</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10.5pt;
+      color: #1a1a2e;
+      background: #fff;
+      width: 8.5in;
+      min-height: 11in;
+      line-height: 1.4;
+    }
+    .accent { color: #2563eb; }
+    .header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 28px 40px 22px;
+    }
+    .header h1 {
+      font-size: 26pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .contact-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+      font-size: 9.5pt;
+      color: #94a3b8;
+    }
+    .contact-line a { color: #60a5fa; text-decoration: none; }
+    .contact-line span { color: #60a5fa; }
+    .main { display: flex; min-height: calc(11in - 80px); }
+    .sidebar {
+      width: 2.4in;
+      background: #f1f5f9;
+      padding: 24px 18px;
+      border-right: 3px solid #2563eb;
+    }
+    .content { flex: 1; padding: 24px 30px; }
+    .section { margin-bottom: 18px; }
+    .section-title {
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #2563eb;
+      border-bottom: 1.5px solid #2563eb;
+      padding-bottom: 3px;
+      margin-bottom: 10px;
+    }
+    .sidebar .section-title { font-size: 8.5pt; }
+    .summary-text { font-size: 10pt; line-height: 1.6; color: #374151; }
+    .job-entry { margin-bottom: 14px; }
+    .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+    .job-title { font-weight: 700; font-size: 11pt; color: #1a1a2e; }
+    .job-date { font-size: 9pt; color: #6b7280; white-space: nowrap; }
+    .job-company { font-size: 10pt; color: #2563eb; font-style: italic; margin-bottom: 4px; }
+    ul.bullets { margin-left: 16px; }
+    ul.bullets li { font-size: 10pt; line-height: 1.5; margin-bottom: 2px; color: #374151; }
+    ul.bullets li a { color: #2563eb; }
+    .project-name { font-weight: 700; font-size: 10.5pt; }
+    .project-tech { font-size: 9pt; color: #6b7280; font-style: italic; }
+    .skill-group { margin-bottom: 10px; }
+    .skill-label { font-weight: 700; font-size: 9pt; color: #1a1a2e; margin-bottom: 3px; }
+    .skill-items { font-size: 9.5pt; color: #4b5563; line-height: 1.5; }
+    .edu-inst { font-weight: 700; font-size: 10pt; }
+    .edu-degree { font-size: 9.5pt; color: #4b5563; font-style: italic; }
+    .edu-date { font-size: 9pt; color: #6b7280; }
+    .cert-item { font-size: 9.5pt; margin-bottom: 5px; line-height: 1.4; }
+    .cert-name { font-weight: 700; color: #1a1a2e; }
+    .cert-issuer { color: #6b7280; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 20px; font-size: 8.5pt; font-weight: 600; }
+    .mt8 { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{name}}</h1>
+  <div class="contact-line">
+    <span>📞 {{phone}}</span>
+    {{#if email}}<a href="mailto:{{email}}">✉ {{email}}</a>{{/if}}
+    {{#if linkedin}}<a href="{{linkedin}}">LinkedIn</a>{{/if}}
+    {{#if github}}<a href="{{github}}">GitHub</a>{{/if}}
+    {{#if portfolio}}<a href="{{portfolio}}">Portfolio</a>{{/if}}
+  </div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    {{#if education.length}}
+    <div class="section">
+      <div class="section-title">Education</div>
+      {{#each education}}
+      <div class="{{#unless @first}}mt8{{/unless}}">
+        <div class="edu-inst">{{institution}}</div>
+        <div class="edu-degree">{{degree}}</div>
+        <div class="edu-date">{{dates}}</div>
+        {{#if location}}<div class="edu-date">{{location}}</div>{{/if}}
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if skills.categories.length}}
+    <div class="section">
+      <div class="section-title">Skills</div>
+      {{#each skills.categories}}
+      <div class="skill-group">
+        <div class="skill-label">{{label}}</div>
+        <div class="skill-items">{{items}}</div>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if certifications.length}}
+    <div class="section">
+      <div class="section-title">Certifications</div>
+      {{#each certifications}}
+      <div class="cert-item">
+        <div class="cert-name">{{name}}</div>
+        {{#if issuer}}<div class="cert-issuer">{{issuer}}</div>{{/if}}
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    {{#if summary}}
+    <div class="section">
+      <div class="section-title">Professional Summary</div>
+      <p class="summary-text">{{summary}}</p>
+    </div>
+    {{/if}}
+
+    {{#if experience.length}}
+    <div class="section">
+      <div class="section-title">Experience</div>
+      {{#each experience}}
+      <div class="job-entry">
+        <div class="job-header">
+          <div class="job-title">{{title}}</div>
+          <div class="job-date">{{dates}}</div>
+        </div>
+        <div class="job-company">{{company}}{{#if location}} — {{location}}{{/if}}</div>
+        <ul class="bullets">
+          {{#each bullets}}<li>{{this}}</li>{{/each}}
+        </ul>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if projects.length}}
+    <div class="section">
+      <div class="section-title">Projects</div>
+      {{#each projects}}
+      <div class="job-entry">
+        <div class="job-header">
+          <span class="project-name">{{name}}</span>
+          <span class="job-date">{{date}}</span>
+        </div>
+        <div class="project-tech">{{tech}}</div>
+        <ul class="bullets">
+          {{#each bullets}}<li>{{this}}</li>{{/each}}
+          {{#if live}}<li><a href="{{live}}">Live Demo</a>{{#if github}} | <a href="{{github}}">GitHub</a>{{/if}}</li>{{/if}}
+        </ul>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+  </div>
+</div>
+
+</body>
+</html>
