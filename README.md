@@ -2,7 +2,6 @@
 
 <img src="frontend/src/assets/logos/logo-dark.png" alt="Nyris AI Logo" width="200"/>
 
-# ✦ Nyris AI
 
 ### AI-Powered Resume Optimizer · Builder · ATS Checker · Roaster
 
