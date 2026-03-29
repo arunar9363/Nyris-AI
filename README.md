@@ -2,8 +2,6 @@
 
 <img src="frontend/src/assets/logos/logo-full.png" alt="Nyris AI Logo" width="200"/>
 
-# ✦ Nyris AI
-
 ### AI-Powered Resume Optimizer · Builder · ATS Checker · Roaster
 
 [![Made with React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
