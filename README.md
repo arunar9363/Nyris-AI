@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/src/assets/logos/logo-full.png" alt="Nyris AI Logo" width="200"/>
+<img src="frontend/src/assets/logos/logo-dark.png" alt="Nyris AI Logo" width="200"/>
 
 # ✦ Nyris AI
 
