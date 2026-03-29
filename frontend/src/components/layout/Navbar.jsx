@@ -153,7 +153,7 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link to="/login" className="btn-ghost text-sm">Login</Link>
-                <Link to="/signup" className="btn-primary text-sm">Get Started</Link>
+                <Link to="/signup" className="btn-primary text-sm">Start</Link>
               </div>
             )}
 
