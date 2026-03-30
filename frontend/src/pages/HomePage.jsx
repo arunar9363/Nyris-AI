@@ -73,9 +73,9 @@ export default function HomePage() {
           {/* Logo mark */}
           <motion.div variants={fadeUp} className="flex justify-center mb-8">
             <motion.div
-              className="w-20 h-20 rounded-3xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#1e3a8a,#4c1d95)', boxShadow: '0 0 50px rgba(59,130,246,0.3)' }}
-              animate={{ boxShadow: ['0 0 30px rgba(59,130,246,0.2)', '0 0 60px rgba(59,130,246,0.4)', '0 0 30px rgba(59,130,246,0.2)'] }}
+              className=" h-5 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(59,130,246,0.1)', boxShadow: '0 8px 30px rgba(59,130,246,0.4)' }}
+              
               transition={{ duration: 3, repeat: Infinity }}
             >
               <img src={logoIcon} alt="Nyris" className="w-12 h-12 object-contain" />
@@ -209,8 +209,8 @@ export default function HomePage() {
             }} />
             <div className="relative z-10">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-6"
-                style={{ background: 'linear-gradient(135deg,#2563eb,#7c3aed)', boxShadow: '0 8px 30px rgba(37,99,235,0.4)' }}>
-                <Star size={24} color="#fff" />
+                style={{ background: '', }}>
+                <Star size={35} color="#fff" />
               </div>
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
                 Ready to Land Your Dream Job?

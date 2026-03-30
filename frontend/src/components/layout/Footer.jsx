@@ -133,7 +133,7 @@ export default function Footer() {
               className="font-semibold hover:underline transition-colors"
               style={{ color: 'var(--accent-blue)' }}
             >
-              Arun Pratap Singh
+              A. P. S
             </a>
           </div>
         </div>

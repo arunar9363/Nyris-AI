@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import arunPhoto from '../assets/images/arun.jpg'
 import api from '../lib/api'
+import drxLogo from '../assets/logos/drxlogo.png';
+import synidLogo from '../assets/logos/synidlogo.png';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } }
@@ -117,7 +119,7 @@ function FeedbackForm({ onNewFeedback }) {
             Share Your Feedback
           </h3>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            Help us improve Nyris — your feedback is published publicly
+            Help us improve Nyris your feedback is published publicly
           </p>
         </div>
       </div>
@@ -359,7 +361,7 @@ export default function AboutPage() {
           </motion.h1>
           <motion.p variants={fadeUp} className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Nyris AI is a full-stack AI platform that eliminates the frustration of resume tailoring.
-            We built it because we've been there — spending hours on a resume, only to hear nothing back.
+            We built it because we've been there spending hours on a resume, only to hear nothing back.
           </motion.p>
         </motion.div>
       </section>
@@ -375,7 +377,7 @@ export default function AboutPage() {
             <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-4">The Resume Black Hole</motion.h2>
             <motion.p variants={fadeUp} className="text-lg mb-12 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
               Most job applications never reach a human reviewer. ATS software filters out resumes
-              that don't match the exact keywords — before a hiring manager ever sees them.
+              that don't match the exact keywords before a hiring manager ever sees them.
             </motion.p>
             <motion.div variants={container} className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map(({ value, label, color }) => (
@@ -397,14 +399,14 @@ export default function AboutPage() {
               Real Case Study
             </motion.p>
             <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-8">The 40-Hour Resume Week</motion.h2>
-            <motion.div variants={fadeUp} className="card p-8 border-l-4" style={{ borderLeftColor: '#3b82f6' }}>
+            <motion.div variants={fadeUp} className="card p-8">
               <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                A typical job seeker spends <strong style={{ color: 'var(--text-primary)' }}>3–4 hours per application</strong> manually tailoring their resume —
+                A typical job seeker spends <strong style={{ color: 'var(--text-primary)' }}>3–4 hours per application</strong> manually tailoring their resume
                 researching the company, identifying keywords, rewriting bullet points, and reformatting the document.
                 Applying to 10 positions means an entire work week just on resume writing.
               </p>
               <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                Despite this effort, most receive <strong style={{ color: '#ef4444' }}>ATS scores below 60</strong> — because they're guessing
+                Despite this effort, most receive <strong style={{ color: '#ef4444' }}>ATS scores below 60</strong>  because they're guessing
                 which keywords matter. The result? Their resume never reaches a human.
               </p>
               <div className="grid md:grid-cols-3 gap-4">
@@ -452,8 +454,97 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ── USE CASE SECTION ── */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={container}>
+            <motion.p variants={fadeUp} className="text-sm font-semibold uppercase tracking-widest mb-3"
+              style={{ color: 'var(--accent-blue)' }}>Real Use Cases</motion.p>
+            <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-4">
+              Who Is Nyris Built For?
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-base mb-12 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+              Every feature in Nyris was designed around one type of person someone who knows they're capable,
+              but keeps getting filtered out before a human even reads their resume.
+            </motion.p>
+
+            <motion.div variants={container} className="grid md:grid-cols-2 gap-5">
+
+              {/* Use Case 1 */}
+              <motion.div variants={fadeUp} className="card p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: 'rgba(59,130,246,0.1)' }}>🎓</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    The Final-Year Student
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  You have good projects, decent grades, and real skills — but every time you apply,
+                  you hear nothing. Your resume isn't bad. It's just not tailored. You paste the JD into
+                  Nyris, upload your resume, and in under a minute you get an ATS-optimized version
+                  with the exact keywords that recruiter is looking for. You stop guessing. You start getting calls.
+                </p>
+              </motion.div>
+
+              {/* Use Case 2 */}
+              <motion.div variants={fadeUp} className="card p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: 'rgba(139,92,246,0.1)' }}>💼</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    The Career Switcher
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  You're moving from one domain to another — maybe from IT support to software development,
+                  or from a non-tech role to a data role. Your experience is transferable but your resume
+                  doesn't show it. Nyris reads the job description, understands what they want,
+                  and rewrites your existing resume to highlight exactly the parts that matter for that role.
+                </p>
+              </motion.div>
+
+              {/* Use Case 3 */}
+              <motion.div variants={fadeUp} className="card p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: 'rgba(16,185,129,0.1)' }}>⚡</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    The Mass Applicant
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  You're applying to 20–30 companies and manually tweaking your resume for each one is
+                  eating hours of your day. With Nyris, you drop in the JD, upload once, and download
+                  a tailored PDF in seconds. What used to take 2–3 hours per application now takes 2 minutes.
+                  You apply more. You apply smarter. You land more interviews.
+                </p>
+              </motion.div>
+
+              {/* Use Case 4 */}
+              <motion.div variants={fadeUp} className="card p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: 'rgba(245,158,11,0.1)' }}>🔍</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    The Self-Doubter
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  You've applied to roles you're genuinely qualified for and still heard nothing.
+                  You start wondering is my resume even readable? Is it formatted right? Am I missing
+                  something obvious? The ATS Checker gives you a real score, points out exactly what's
+                  wrong, and tells you specifically what to fix. No more guessing. Just a clear answer.
+                </p>
+              </motion.div>
+
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Lead Developer */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4" style={{ background: 'var(--bg-secondary)' }}>
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={container}>
             <motion.p variants={fadeUp} className="text-sm font-semibold uppercase tracking-widest mb-3 text-center"
@@ -465,11 +556,11 @@ export default function AboutPage() {
                 <div className="shrink-0 flex flex-col items-center gap-4">
                   <div className="relative">
                     <div className="w-36 h-36 rounded-3xl overflow-hidden"
-                      style={{ boxShadow: '0 0 40px rgba(59,130,246,0.2)' }}>
+                     >
                       <img src={arunPhoto} alt="Arun Pratap Singh" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg,#2563eb,#7c3aed)' }}>
+                      style={{ background: 'var(--accent-blue)' }}>
                       <Code2 size={14} color="#fff" />
                     </div>
                   </div>
@@ -491,8 +582,9 @@ export default function AboutPage() {
                     </a>
                   </div>
                 </div>
+
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-1">
                     <h3 className="text-2xl font-bold" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
                       Arun Pratap Singh
                     </h3>
@@ -501,26 +593,74 @@ export default function AboutPage() {
                       Lead Developer
                     </span>
                   </div>
-                  <p className="text-sm mb-4 font-medium" style={{ color: 'var(--accent-blue)' }}>
-                    Full Stack Developer · B.Tech IT · Galgotias College of Engineering
+                  <p className="text-sm mb-5 font-medium" style={{ color: 'var(--accent-blue)' }}>
+                    Full Stack Developer · B.Tech Information Technology
                   </p>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Software Developer with experience in designing and developing scalable web and AI-driven applications
-                    using modern technologies. Strong foundation in problem-solving and software development principles,
-                    committed to delivering efficient, reliable, and user-focused solutions.
-                  </p>
+
                   <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>
-                    Built Nyris AI to solve a problem he personally faced — spending hours tailoring resumes with no guarantee
-                    of ATS compatibility. He combined his full-stack expertise with Groq AI to build a platform that makes
-                    resume optimization effortless, intelligent, and accessible to every student and professional.
+                    I'm a final-year undergrad who builds and ships full-stack, AI-powered products independently
+                    not as assignments, but as real platforms that real people use. I don't wait to learn things in class.
+                    I pick a problem that bothers me, figure out the stack I need, and build until it's live.
+                    Nyris came out of my own frustration I spent hours tailoring resumes and still got ignored.
+                    So I built the tool I wished existed.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {['React.js', 'Node.js', 'Python', 'MongoDB', 'AI/LLM', 'Firebase', 'Tailwind'].map((skill) => (
-                      <span key={skill} className="text-xs px-2.5 py-1 rounded-lg font-medium"
-                        style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
-                        {skill}
-                      </span>
-                    ))}
+
+                  {/* Notable Projects */}
+                  <div className="space-y-3 mb-6">
+                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
+                      Other Things I've Built
+                    </p>
+
+                    {/* DoctorXCare */}
+                    <a href="https://doctorxcare.in" target="_blank" rel="noreferrer"
+                      className="flex items-start gap-3 p-4 rounded-xl border transition-all duration-200 hover:-translate-y-0.5"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', textDecoration: 'none', display: 'flex' }}
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(6,182,212,0.35)'}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+                    >
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base"
+                        style={{ background: 'rgba(6,182,212,0.12)' }}><img src="/src/assets/logos/drxlogo.png" alt="DoctorXCare" className="w-7 h-7 object-contain" /></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>DoctorXCare</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-bold"
+                            style={{ background: 'rgba(6,182,212,0.12)', color: '#06b6d4' }}>Live</span>
+                        </div>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                          I built this because I kept seeing people panic over health symptoms at midnight with no one to ask.
+                          DoctorXCare lets you describe what you're feeling and get instant, structured guidance on what might be wrong, how urgent it is, and what to do next. It's
+                          not a generic Google result, but a proper AI-driven response. You can also upload
+                          your lab reports and it breaks them down in plain language, tracks your health over time,
+                          and helps you find the right doctor nearby when you actually need one.
+                        </p>
+                      </div>
+                    </a>
+
+                    {/* SYNID AI */}
+                    <a href="https://synidai.onrender.com" target="_blank" rel="noreferrer"
+                      className="flex items-start gap-3 p-4 rounded-xl border transition-all duration-200 hover:-translate-y-0.5"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', textDecoration: 'none', display: 'flex' }}
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(139,92,246,0.35)'}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+                    >
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base"
+                        style={{ background: 'rgba(139,92,246,0.12)' }}><img src="/src/assets/logos/synidlogo.png" alt="SYNID AI" className="w-7 h-7 object-contain" /></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>SYNID AI</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-bold"
+                            style={{ background: 'rgba(139,92,246,0.12)', color: '#8b5cf6' }}>Live</span>
+                        </div>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                          I was paying for AI tools I didn't fully control, so I built my own. SYNID AI is a
+                          self-hosted chat assistant where your conversations stay in your own database,
+                          you can switch between multiple AI models on the fly, set custom personalities,
+                          and get responses that stream token by token in real time exactly like ChatGPT,
+                          except it's mine and I know exactly where the data goes.
+                    
+                        </p>
+                      </div>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -539,7 +679,7 @@ export default function AboutPage() {
               Your Feedback Matters
             </motion.h2>
             <motion.p variants={fadeUp} className="text-base text-center mb-12" style={{ color: 'var(--text-secondary)' }}>
-              Share a suggestion, report a bug, or just say hi — we read every message.
+              Share a suggestion, report a bug, or just say hi we read every message.
             </motion.p>
 
             {/* Form */}
