@@ -21,7 +21,9 @@ app.use(helmet({ contentSecurityPolicy: false }));
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL,       // e.g. https://nyris-ai-frontend.onrender.com
+  'https://nyris.in',
+  'https://www.nyris.in',
+  process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(cors({

@@ -21,10 +21,10 @@ const stats = [
 ]
 
 const solutions = [
-  { icon: Sparkles, title: 'AI-Powered Optimization', desc: 'Groq AI analyzes your resume against the JD and optimizes every bullet point, keyword, and section for maximum ATS compatibility.' },
+  { icon: Sparkles, title: 'AI-Powered Optimization', desc: 'AI analyzes your resume against the JD and optimizes every bullet point, keyword, and section for maximum ATS compatibility.' },
   { icon: Target, title: 'Keyword Matching', desc: 'We identify missing keywords from the job description and intelligently integrate them into your resume without sounding robotic.' },
-  { icon: TrendingUp, title: 'ATS Score Tracking', desc: 'Real-time ATS scoring shows you exactly how your resume performs — and what to fix to push it above 85+.' },
-  { icon: CheckCircle, title: 'Professional Templates', desc: '3 ATS-optimized HTML templates (Minimal, Modern, Creative) that render pixel-perfect PDFs via Puppeteer.' },
+  { icon: TrendingUp, title: 'ATS Score Tracking', desc: 'Real-time ATS scoring shows you exactly how your resume performs and what to fix to push it above 85+.' },
+  { icon: CheckCircle, title: 'Professional Templates', desc: 'ATS-optimized templates (Minimal, Modern, Creative) that render pixel-perfect PDFs via Puppeteer.' },
 ]
 
 const FEEDBACK_TYPES = [
@@ -360,8 +360,8 @@ export default function AboutPage() {
             <span className="text-gradient">Powered by AI.</span>
           </motion.h1>
           <motion.p variants={fadeUp} className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Nyris AI is a full-stack AI platform that eliminates the frustration of resume tailoring.
-            We built it because we've been there spending hours on a resume, only to hear nothing back.
+            Nyris is a AI platform that eliminates the frustration of resume tailoring.
+            We built it because we've been there spending hours on a resume, only to hear nothing back. Resume optimization shouldn't be a black box or a guessing game. With Nyris, you get an ATS-optimized resume in minutes, so you can focus on preparing for interviews and landing your dream job.
           </motion.p>
         </motion.div>
       </section>
@@ -377,7 +377,7 @@ export default function AboutPage() {
             <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-4">The Resume Black Hole</motion.h2>
             <motion.p variants={fadeUp} className="text-lg mb-12 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
               Most job applications never reach a human reviewer. ATS software filters out resumes
-              that don't match the exact keywords before a hiring manager ever sees them.
+              that don't match the exact keywords before a hiring manager ever sees them. Job seekers are left in the dark, spending hours tailoring resumes with no feedback on what works. The result? A frustrating, inefficient process where qualified candidates get rejected by an algorithm.
             </motion.p>
             <motion.div variants={container} className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map(({ value, label, color }) => (
@@ -398,22 +398,22 @@ export default function AboutPage() {
             <motion.p variants={fadeUp} className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent-blue)' }}>
               Real Case Study
             </motion.p>
-            <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-8">The 40-Hour Resume Week</motion.h2>
+            <motion.h2 variants={fadeUp} className="section-heading text-4xl mb-8">The 10-Hour Resume Week</motion.h2>
             <motion.div variants={fadeUp} className="card p-8">
               <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                A typical job seeker spends <strong style={{ color: 'var(--text-primary)' }}>3–4 hours per application</strong> manually tailoring their resume
+                A typical job seeker spends <strong style={{ color: 'var(--text-primary)' }}>1-2 hours per application</strong> manually tailoring their resume
                 researching the company, identifying keywords, rewriting bullet points, and reformatting the document.
                 Applying to 10 positions means an entire work week just on resume writing.
               </p>
               <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
                 Despite this effort, most receive <strong style={{ color: '#ef4444' }}>ATS scores below 60</strong>  because they're guessing
-                which keywords matter. The result? Their resume never reaches a human.
+                which keywords matter. The result? Their resume never reaches a human. With Nyris, that same job seeker can get an ATS-optimized resume in under 5 minutes, with a score above 85, and start getting interview calls instead of radio silence.
               </p>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { before: '40+ hours', after: '~5 mins', label: 'Resume tailoring time' },
+                  { before: '10+ hours', after: '~5 mins', label: 'Resume tailoring time' },
                   { before: 'ATS score: 45', after: 'ATS score: 88', label: 'Average ATS improvement' },
-                  { before: '2% callbacks', after: '14% callbacks', label: 'Interview callback rate' },
+                  { before: '7% callbacks', after: '20% callbacks', label: 'Interview callback rate' },
                 ].map(({ before, after, label }) => (
                   <div key={label} className="p-4 rounded-2xl" style={{ background: 'var(--bg-secondary)' }}>
                     <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>{label}</div>
@@ -480,7 +480,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You have good projects, decent grades, and real skills — but every time you apply,
+                  You have good projects, decent grades, and real skills but every time you apply,
                   you hear nothing. Your resume isn't bad. It's just not tailored. You paste the JD into
                   Nyris, upload your resume, and in under a minute you get an ATS-optimized version
                   with the exact keywords that recruiter is looking for. You stop guessing. You start getting calls.
@@ -497,7 +497,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You're moving from one domain to another — maybe from IT support to software development,
+                  You're moving from one domain to another maybe from IT support to software development,
                   or from a non-tech role to a data role. Your experience is transferable but your resume
                   doesn't show it. Nyris reads the job description, understands what they want,
                   and rewrites your existing resume to highlight exactly the parts that matter for that role.
@@ -619,7 +619,7 @@ export default function AboutPage() {
                       onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                     >
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base"
-                        style={{ background: 'rgba(6,182,212,0.12)' }}><img src="/src/assets/logos/drxlogo.png" alt="DoctorXCare" className="w-7 h-7 object-contain" /></div>
+                        style={{ background: 'rgba(6,182,212,0.12)' }}><img src={drxLogo} alt="DoctorXCare" className="w-7 h-7 object-contain" /></div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>DoctorXCare</span>
@@ -644,7 +644,7 @@ export default function AboutPage() {
                       onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                     >
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base"
-                        style={{ background: 'rgba(139,92,246,0.12)' }}><img src="/src/assets/logos/synidlogo.png" alt="SYNID AI" className="w-7 h-7 object-contain" /></div>
+                        style={{ background: 'rgba(139,92,246,0.12)' }}><img src={synidLogo} alt="SYNID AI" className="w-7 h-7 object-contain" /></div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>SYNID AI</span>

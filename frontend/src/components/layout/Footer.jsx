@@ -22,7 +22,6 @@ const footerLinks = {
 }
 
 const socials = [
-  { icon: Github, href: 'https://github.com/arunar9363', label: 'GitHub' },
   { icon: Linkedin, href: 'https://www.linkedin.com/in/arun-pratap-singh-944491292', label: 'LinkedIn' },
   { icon: Globe, href: 'https://arunps-portfolio.vercel.app/', label: 'Portfolio' },
   { icon: Mail, href: 'mailto:arunstp45@gmail.com', label: 'Email' },
