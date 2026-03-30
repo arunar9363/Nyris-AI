@@ -2,10 +2,10 @@ require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/database');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0',() => {
     console.log(`🚀 Nyris AI Server running on port ${PORT}`);
     console.log(`📍 Environment: ${process.env.NODE_ENV}`);
   });
