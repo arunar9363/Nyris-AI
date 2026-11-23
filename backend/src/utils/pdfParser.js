@@ -1,4 +1,3 @@
-const { PDFParse } = require('pdf-parse');
 const JSZip = require('jszip');
 const { Writable } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
@@ -16,6 +15,13 @@ function readableText(value, label) {
 }
 
 async function extractTextFromPDF(buffer, { includeLinks = false } = {}) {
+  let PDFParse;
+  try {
+    ({ PDFParse } = require('pdf-parse'));
+  } catch (error) {
+    console.error('PDF support could not be loaded (' + (error.code || error.name) + ').');
+    throw httpError(503, 'PDF processing is unavailable. Upload a DOCX or TXT file, or paste the text.');
+  }
   const parser = new PDFParse({ data: new Uint8Array(buffer), isEvalSupported: false, stopAtErrors: true });
   let content;
   try {

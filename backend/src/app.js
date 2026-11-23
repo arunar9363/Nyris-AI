@@ -25,12 +25,19 @@ const allowedOrigins = new Set([
   'https://nyris.in',
   'https://www.nyris.in',
 ]);
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.RENDER !== 'true') {
   allowedOrigins.add('http://localhost:5174');
   allowedOrigins.add('http://127.0.0.1:5174');
 }
 for (const candidate of (process.env.FRONTEND_URL || '').split(',')) {
-  if (candidate.trim()) allowedOrigins.add(new URL(candidate.trim()).origin);
+  const value = candidate.trim();
+  if (!value) continue;
+  const url = URL.canParse(value) ? new URL(value) : null;
+  if (url && ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password) {
+    allowedOrigins.add(url.origin);
+  } else {
+    console.warn('Ignoring an invalid FRONTEND_URL entry. Use an absolute HTTP or HTTPS URL.');
+  }
 }
 
 app.use(cors({
