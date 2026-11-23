@@ -573,7 +573,7 @@ export default function AboutPage() {
                       </div>
                     </a>
 
-                    <a href="https://github.com/arunar9363/Multimodal-AI-Sentiment-Analysis-System-_MAC" target="_blank" rel="noreferrer"
+                    <a href="https://mac-jlzf.onrender.com/" target="_blank" rel="noreferrer"
                       className="flex items-start gap-2 rounded-lg border p-2.5 transition-all duration-200 hover:-translate-y-0.5 sm:gap-3 sm:rounded-xl sm:p-4"
                       style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }}
                       onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(16,185,129,0.35)'}
@@ -585,7 +585,7 @@ export default function AboutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Multimodal AI Sentiment Analysis System</span>
+                          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>MAC - Your Wellbeing Check-ins</span>
                         </div>
                         <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                           A Python pipeline that analyzes sentiment and emotion across text, audio, and video.
