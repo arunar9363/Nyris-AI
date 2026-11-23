@@ -328,7 +328,52 @@ body {
   }
 }
 
+.home-examples {
+  --example-gap: clamp(.375rem, 1.25vw, .5rem);
+}
+
+.home-examples-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--example-gap);
+}
+
+.home-examples-row[aria-hidden="true"] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-examples:not([data-paused="true"], :has(:focus-visible)) {
+    overflow: clip;
+  }
+
+  .home-examples:not([data-paused="true"], :has(:focus-visible)) .home-examples-track {
+    display: flex;
+    width: max-content;
+    min-width: 200%;
+    animation: scroll-home-examples 28s linear infinite;
+  }
+
+  .home-examples:not([data-paused="true"], :has(:focus-visible)) .home-examples-row {
+    display: flex;
+    flex: 1 0 auto;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    padding-inline-end: var(--example-gap);
+  }
+}
+
+@media (hover: hover) {
+  .home-examples:hover .home-examples-track {
+    animation-play-state: paused;
+  }
+}
+
 /* Animations */
+@keyframes scroll-home-examples {
+  to { transform: translateX(-50%); }
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
