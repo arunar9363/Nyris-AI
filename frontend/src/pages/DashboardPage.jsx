@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sparkles, FileText, BarChart3, Flame, Star, Clock, TrendingUp, ArrowRight } from 'lucide-react'
@@ -18,60 +18,72 @@ const TYPE_COLORS = { optimized: '#3b82f6', built: '#8b5cf6', ats_check: '#06b6d
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
-  const { history, historyLoading, fetchHistory, toggleFavorite } = useResumeStore()
+  const { history, historyLoading, historyError, fetchHistory, toggleFavorite } = useResumeStore()
+  const [actionError, setActionError] = useState('')
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => { fetchHistory() }, [fetchHistory])
 
   const recent = history.slice(0, 5)
   const favoriteCount = history.filter((r) => r.isFavorite).length
-  const avgAts = history.filter((r) => r.atsScore).length
-    ? Math.round(history.filter((r) => r.atsScore).reduce((s, r) => s + r.atsScore, 0) / history.filter((r) => r.atsScore).length)
-    : 0
+  const scored = history.filter(item => typeof item.atsScore === 'number')
+  const avgAts = scored.length ? Math.round(scored.reduce((sum, item) => sum + item.atsScore, 0) / scored.length) : null
+
+  async function favorite(id) {
+    setUpdating(true)
+    setActionError('')
+    try {
+      const result = await toggleFavorite(id)
+      if (!result.success) setActionError(result.message)
+    } finally {
+      setUpdating(false)
+    }
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="page-spacing mx-auto max-w-6xl">
       {/* Greeting */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-        <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-5 sm:mb-10">
+        <h1 className="mb-1 break-words text-2xl font-bold sm:text-3xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
           Welcome back, {user?.name?.split(' ')[0]} 👋
         </h1>
-        <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
           Here's your Nyris dashboard
         </p>
       </motion.div>
 
       {/* Stats */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        className="mb-5 grid grid-cols-2 gap-2 sm:mb-10 sm:gap-4 md:grid-cols-4">
         {[
-          { label: 'Total Resumes', value: history.length, icon: FileText, color: '#3b82f6' },
-          { label: 'Favorites', value: favoriteCount, icon: Star, color: '#f59e0b' },
-          { label: 'Avg ATS Score', value: avgAts ? `${avgAts}%` : '—', icon: TrendingUp, color: '#10b981' },
+          { label: 'Recent saved items', value: history.length, icon: FileText, color: '#3b82f6' },
+          { label: 'Recent favorites', value: favoriteCount, icon: Star, color: '#f59e0b' },
+          { label: 'Average readiness', value: avgAts === null ? '—' : avgAts + '/100', icon: TrendingUp, color: '#10b981' },
           { label: 'This Month', value: history.filter((r) => new Date(r.createdAt) > new Date(Date.now() - 30 * 86400000)).length, icon: Clock, color: '#8b5cf6' },
         ].map(({ label, value, icon: Icon, color }, i) => (
           <motion.div key={label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}
-            className="card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
-                <Icon size={16} style={{ color }} />
+            className="card min-w-0 p-3 sm:p-5">
+            <div className="mb-1.5 flex items-center justify-between sm:mb-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg sm:h-8 sm:w-8 sm:rounded-xl" style={{ background: `${color}15` }}>
+                <Icon size={14} className="sm:h-4 sm:w-4" style={{ color }} />
               </div>
             </div>
-            <div className="text-2xl font-bold mb-0.5" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>{value}</div>
+            <div className="mb-0.5 text-lg font-bold sm:text-2xl" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>{value}</div>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</div>
           </motion.div>
         ))}
       </motion.div>
 
       {/* Quick Actions */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mb-10">
-        <h2 className="text-lg font-bold mb-5" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mb-5 sm:mb-10">
+        <h2 className="mb-2.5 text-base font-bold sm:mb-5 sm:text-lg" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
           {QUICK_ACTIONS.map(({ label, desc, icon: Icon, path, color }, i) => (
             <motion.div key={label} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + i * 0.06 }}>
-              <Link to={path} className="group card p-5 block hover:-translate-y-1 transition-all duration-200 hover:border-blue-500/30">
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110"
+              <Link to={path} className="group card block p-3 transition-all duration-200 hover:-translate-y-1 hover:border-blue-500/30 sm:p-5">
+                <div className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg transition-transform group-hover:scale-110 sm:mb-3 sm:h-10 sm:w-10 sm:rounded-2xl"
                   style={{ background: `${color}15` }}>
-                  <Icon size={18} style={{ color }} />
+                  <Icon size={15} className="sm:h-[18px] sm:w-[18px]" style={{ color }} />
                 </div>
                 <div className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{label}</div>
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{desc}</div>
@@ -83,18 +95,24 @@ export default function DashboardPage() {
 
       {/* Recent Resumes */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>Recent Resumes</h2>
+        <div className="mb-2.5 flex items-center justify-between sm:mb-5">
+          <h2 className="text-base font-bold sm:text-lg" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>Recent Resumes</h2>
           <Link to="/history" className="btn-ghost text-xs gap-1">View all <ArrowRight size={12} /></Link>
         </div>
 
-        {historyLoading ? (
+        {actionError && <p className="resume-error mb-3" role="alert">{actionError}</p>}
+        {historyError ? (
+          <div className="card p-3.5 sm:p-5">
+            <p className="resume-error" role="alert">{historyError}</p>
+            <button type="button" className="btn-secondary mt-3" onClick={fetchHistory}>Retry</button>
+          </div>
+        ) : historyLoading ? (
           <div className="space-y-3">
             {[1,2,3].map((i) => <SkeletonCard key={i} lines={2} />)}
           </div>
         ) : recent.length === 0 ? (
-          <div className="card p-10 text-center">
-            <FileText size={32} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
+          <div className="card p-5 text-center sm:p-10">
+            <FileText size={24} className="mx-auto mb-2 sm:mb-3 sm:h-8 sm:w-8" style={{ color: 'var(--text-muted)' }} />
             <p className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>No resumes yet</p>
             <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>Start with the JD Optimizer</p>
             <Link to="/optimizer" className="btn-primary inline-flex"><Sparkles size={14} /> Optimize Now</Link>
@@ -104,13 +122,13 @@ export default function DashboardPage() {
             {recent.map((resume, i) => (
               <motion.div key={resume._id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.07 }}
-                className="card p-4 flex items-center gap-4 hover:border-blue-500/20 transition-all">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                className="card flex items-center gap-2 p-2.5 transition-all hover:border-blue-500/20 sm:gap-4 sm:p-4">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9 sm:rounded-xl"
                   style={{ background: `${TYPE_COLORS[resume.type] || '#3b82f6'}15` }}>
                   <FileText size={16} style={{ color: TYPE_COLORS[resume.type] || '#3b82f6' }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2 sm:flex-nowrap">
                     <span className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{resume.title}</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0"
                       style={{ background: `${TYPE_COLORS[resume.type]}15`, color: TYPE_COLORS[resume.type] }}>
@@ -122,7 +140,8 @@ export default function DashboardPage() {
                     {resume.atsScore ? ` · ATS: ${resume.atsScore}` : ''}
                   </p>
                 </div>
-                <button onClick={() => toggleFavorite(resume._id)} className="p-1.5 rounded-lg transition-colors hover:bg-yellow-500/15">
+                <button type="button" disabled={updating} aria-label="Toggle favorite" onClick={() => favorite(resume._id)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-yellow-500/15 sm:h-auto sm:w-auto sm:p-1.5">
                   <Star size={14} style={{ color: resume.isFavorite ? '#f59e0b' : 'var(--text-muted)', fill: resume.isFavorite ? '#f59e0b' : 'none' }} />
                 </button>
               </motion.div>

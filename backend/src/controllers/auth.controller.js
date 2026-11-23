@@ -26,18 +26,22 @@ const sendAuthResponse = (user, statusCode, res) => {
 
 exports.signup = async (req, res, next) => {
   try {
-    const { name, email, password, educationLevel, degree, branch } = req.body;
+    const { name, email, password, educationLevel, degree, branch } = req.body || {};
 
-    if (!name || !email || !password || !educationLevel) {
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string' || !educationLevel) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({ success: false, message: 'Choose a shorter password. The limit is 72 bytes.' });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'Email already registered. Please login.' });
     }
 
-    const user = await User.create({ name, email, password, educationLevel, degree: degree || 'N/A', branch });
+    const user = await User.create({ name, email: normalizedEmail, password, educationLevel, degree: degree || 'N/A', branch });
     sendAuthResponse(user, 201, res);
   } catch (error) {
     next(error);
@@ -46,13 +50,13 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (!email || !password) {
+    if (typeof email !== 'string' || !email.trim() || typeof password !== 'string' || !password) {
       return res.status(400).json({ success: false, message: 'Please provide email and password.' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }

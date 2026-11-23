@@ -10,6 +10,7 @@ const resumeSchema = new mongoose.Schema({
     type: String, // for non-logged-in users
     default: null,
   },
+  expiresAt: { type: Date, index: { expires: 0 } },
   type: {
     type: String,
     enum: ['optimized', 'built', 'ats_check', 'roasted'],
@@ -24,6 +25,10 @@ const resumeSchema = new mongoose.Schema({
     enum: ['minimal', 'modern', 'creative'],
     default: 'minimal',
   },
+  paperSize: { type: String, enum: ['LETTER', 'A4'], default: 'LETTER' },
+  sectionOrder: { type: [String], default: undefined },
+  profile: { type: String, default: '' },
+  resumeData: mongoose.Schema.Types.Mixed,
   originalResumeText: {
     type: String,
     default: '',
@@ -46,17 +51,42 @@ const resumeSchema = new mongoose.Schema({
     max: 100,
     default: null,
   },
+  tailoring: {
+    mode: String,
+    originalScore: Number,
+    originalMatches: Number,
+    warnings: [String],
+  },
   atsReport: {
     missingKeywords: [String],
     formattingIssues: [String],
     suggestions: [String],
     strengths: [String],
+    matchedKeywords: [String],
+    scoreBreakdown: mongoose.Schema.Types.Mixed,
+    evaluatedWithJobDescription: Boolean,
+    targetRole: String,
+    documentChecks: [{ label: String, passed: Boolean, detail: String, _id: false }],
+    termEvidence: [{ term: String, status: String, excerpt: String, section: String, _id: false }],
+    advanced: mongoose.Schema.Types.Mixed,
   },
   roastContent: {
     funnyRoast: String,
     seriousFeedback: String,
     mistakesBreakdown: [String],
     improvementTips: [String],
+    overallRating: String,
+    verdict: String,
+    targetRole: String,
+    tone: String,
+    rubric: [{ label: String, score: Number, summary: String, _id: false }],
+    findings: [{ id: String, title: String, priority: String, action: String, evidence: String, section: String, _id: false }],
+    evidenceHighlight: { text: String, section: String },
+    matchedKeywords: [String],
+    missingKeywords: [String],
+    coachingNote: String,
+    coachingStatus: String,
+    detailedReview: mongoose.Schema.Types.Mixed,
   },
   personalInfo: {
     name: String,
@@ -78,4 +108,5 @@ const resumeSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+resumeSchema.index({ userId: 1, createdAt: -1 });
 module.exports = mongoose.model('Resume', resumeSchema);

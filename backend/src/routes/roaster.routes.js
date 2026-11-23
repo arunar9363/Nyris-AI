@@ -1,9 +1,8 @@
 const express = require('express');
+const { roastResume } = require('../controllers/roaster.controller');
+const { protect } = require('../middleware/auth.middleware');
+const { readUploads } = require('../middleware/upload.middleware');
+
 const router = express.Router();
-const roasterController = require('../controllers/roaster.controller');
-const { optionalAuth } = require('../middleware/auth.middleware');
-const upload = require('../middleware/upload.middleware');
-
-router.post('/roast', optionalAuth, upload.single('resumeFile'), roasterController.roastResume);
-
+router.post('/roast', protect, readUploads('resumeFile'), roastResume);
 module.exports = router;

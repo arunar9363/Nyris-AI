@@ -1,198 +1,100 @@
 import { create } from 'zustand'
-import api from '../lib/api'
+import api, { responseMessage } from '../lib/api'
+
+async function post(path, body, fallback) {
+  try {
+    const { data } = await api.post(path, body)
+    return { success: true, data: data.data }
+  } catch (error) {
+    return { success: false, message: responseMessage(error, fallback) }
+  }
+}
+
+export function optimizeResume({ contact, settings, ...input }) {
+  return post('/resume/optimize', { ...input, ...contact, ...settings }, 'Could not optimize the resume. Please try again.')
+}
+
+export function buildResume(formData, options) {
+  return post('/resume/build', { formData, ...options }, 'Could not build the resume. Please try again.')
+}
+
+export async function importResumeDraft(intake) {
+  if (intake.parsed?.text === intake.text) return { success: true, data: intake.parsed }
+  const response = await post('/resume/extract', { kind: 'resume-draft', resumeText: intake.text }, 'Could not import the resume.')
+  if (response.success && !response.data?.draft) {
+    return { success: false, message: 'Update the connected API to auto-fill resume details.' }
+  }
+  return response
+}
+
+export async function previewResume(payload, signal) {
+  const { data } = await api.post('/resume/preview', payload, { signal })
+  return data.data
+}
+
+export async function readResumeFile(file, kind, signal) {
+  const form = new FormData()
+  form.append('document', file)
+  form.append('kind', kind)
+  try {
+    const { data } = await api.post('/resume/extract', form, { signal })
+    if (!data?.success || typeof data.data?.text !== 'string') {
+      return { success: false, message: 'The connected server returned an unexpected upload response. Check the API URL or paste the document text.' }
+    }
+    return { success: true, data: data.data }
+  } catch (error) {
+    const message = error.response?.status === 404
+      ? 'The connected API needs an update to accept file uploads. You can paste the document text to continue.'
+      : responseMessage(error, 'Could not read the document.')
+    return { success: false, message }
+  }
+}
+
+export function reviewResume(tool, details) {
+  const path = tool === 'ats' ? '/ats/check' : '/roaster/roast'
+  return post(path, details, 'Could not review the resume. Please try again.')
+}
 
 const useResumeStore = create((set, get) => ({
-  // Optimizer flow state
-  optimizerStep: 1,
-  jobDescription: '',
-  jdFile: null,
-  resumeFile: null,
-  resumeText: '',
-  customSuggestions: '',
-  personalInfo: {
-    name: '', email: '', phone: '',
-    linkedin: '', github: '', portfolio: '',
-    projectLinks: [''],
-  },
-  selectedTemplate: 'minimal',
-
-  // Results
-  optimizerResult: null,
-  isOptimizing: false,
-  optimizerProgress: 0,
-  optimizerStage: '',
-
-  // History
   history: [],
-  favorites: [],
   historyLoading: false,
-
-  // ATS
-  atsResult: null,
-  atsLoading: false,
-
-  // Roaster
-  roastResult: null,
-  roastLoading: false,
-
-  // Builder
-  builderResult: null,
-  builderLoading: false,
-
-  // Setters
-  setOptimizerStep: (step) => set({ optimizerStep: step }),
-  setJobDescription: (v) => set({ jobDescription: v }),
-  setJdFile: (f) => set({ jdFile: f }),
-  setResumeFile: (f) => set({ resumeFile: f }),
-  setResumeText: (v) => set({ resumeText: v }),
-  setCustomSuggestions: (v) => set({ customSuggestions: v }),
-  setPersonalInfo: (info) => set((s) => ({ personalInfo: { ...s.personalInfo, ...info } })),
-  setSelectedTemplate: (t) => set({ selectedTemplate: t }),
-
-  resetOptimizer: () => set({
-    optimizerStep: 1,
-    jobDescription: '',
-    jdFile: null,
-    resumeFile: null,
-    resumeText: '',
-    customSuggestions: '',
-    personalInfo: { name: '', email: '', phone: '', linkedin: '', github: '', portfolio: '', projectLinks: [''] },
-    selectedTemplate: 'minimal',
-    optimizerResult: null,
-    optimizerProgress: 0,
-    optimizerStage: '',
+  historyError: '',
+  clearPrivateResults: () => set({
+    history: [], historyError: '', historyLoading: false,
   }),
 
-  // Optimize resume action
-  optimizeResume: async () => {
-    const s = get()
-    set({ isOptimizing: true, optimizerProgress: 0, optimizerStage: 'Parsing resume...' })
-
-    const progressStages = [
-      { pct: 15, msg: 'Parsing resume content...' },
-      { pct: 30, msg: 'Analyzing job description...' },
-      { pct: 50, msg: 'AI optimizing content...' },
-      { pct: 70, msg: 'Injecting into template...' },
-      { pct: 85, msg: 'Generating PDF...' },
-      { pct: 95, msg: 'Finalizing...' },
-    ]
-
-    let stageIdx = 0
-    const interval = setInterval(() => {
-      if (stageIdx < progressStages.length) {
-        const { pct, msg } = progressStages[stageIdx]
-        set({ optimizerProgress: pct, optimizerStage: msg })
-        stageIdx++
-      }
-    }, 1500)
-
-    try {
-      const formData = new FormData()
-      formData.append('jobDescription', s.jobDescription)
-      formData.append('customSuggestions', s.customSuggestions)
-      formData.append('templateId', s.selectedTemplate)
-      formData.append('name', s.personalInfo.name)
-      formData.append('email', s.personalInfo.email)
-      formData.append('phone', s.personalInfo.phone)
-      formData.append('linkedin', s.personalInfo.linkedin)
-      formData.append('github', s.personalInfo.github)
-      formData.append('portfolio', s.personalInfo.portfolio)
-      s.personalInfo.projectLinks.filter(Boolean).forEach((l) => formData.append('projectLinks', l))
-      if (s.resumeFile) formData.append('resumeFile', s.resumeFile)
-      else formData.append('resumeText', s.resumeText)
-      if (s.jdFile) formData.append('jdFile', s.jdFile)
-
-      const { data } = await api.post('/resume/optimize', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-
-      clearInterval(interval)
-      set({ optimizerProgress: 100, optimizerStage: 'Done!', optimizerResult: data.data, isOptimizing: false })
-      return { success: true }
-    } catch (err) {
-      clearInterval(interval)
-      set({ isOptimizing: false, optimizerProgress: 0, optimizerStage: '' })
-      return { success: false, message: err.response?.data?.message || 'Optimization failed' }
-    }
-  },
-
-  // Check ATS
-  checkATS: async (file, jobDescription, resumeText) => {
-    set({ atsLoading: true, atsResult: null })
-    try {
-      const formData = new FormData()
-      if (file) formData.append('resumeFile', file)
-      else formData.append('resumeText', resumeText)
-      if (jobDescription) formData.append('jobDescription', jobDescription)
-
-      const { data } = await api.post('/ats/check', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      set({ atsResult: data.data, atsLoading: false })
-      return { success: true }
-    } catch (err) {
-      set({ atsLoading: false })
-      return { success: false, message: err.response?.data?.message || 'ATS check failed' }
-    }
-  },
-
-  // Roast resume
-  roastResume: async (file, resumeText) => {
-    set({ roastLoading: true, roastResult: null })
-    try {
-      const formData = new FormData()
-      if (file) formData.append('resumeFile', file)
-      else formData.append('resumeText', resumeText)
-
-      const { data } = await api.post('/roaster/roast', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      set({ roastResult: data.data, roastLoading: false })
-      return { success: true }
-    } catch (err) {
-      set({ roastLoading: false })
-      return { success: false, message: err.response?.data?.message || 'Roast failed' }
-    }
-  },
-
-  // Build resume
-  buildResume: async (formData, domain, templateId) => {
-    set({ builderLoading: true, builderResult: null })
-    try {
-      const { data } = await api.post('/resume/build', { formData, domain, templateId })
-      set({ builderResult: data.data, builderLoading: false })
-      return { success: true }
-    } catch (err) {
-      set({ builderLoading: false })
-      return { success: false, message: err.response?.data?.message || 'Build failed' }
-    }
-  },
-
-  // Fetch history
   fetchHistory: async () => {
-    set({ historyLoading: true })
+    if (get().historyLoading) return
+    const token = localStorage.getItem('nyris_token')
+    set({ historyLoading: true, historyError: '' })
     try {
       const { data } = await api.get('/resume/history')
-      set({ history: data.data, historyLoading: false })
-    } catch {
-      set({ historyLoading: false })
+      if (localStorage.getItem('nyris_token') === token) set({ history: data.data })
+    } catch (error) {
+      if (localStorage.getItem('nyris_token') === token) set({ historyError: responseMessage(error, 'Unable to load your saved resumes.') })
+    } finally {
+      if (localStorage.getItem('nyris_token') === token) set({ historyLoading: false })
     }
   },
 
-  toggleFavorite: async (id) => {
+  toggleFavorite: async id => {
     try {
-      await api.patch(`/resume/${id}/favorite`)
-      set((s) => ({
-        history: s.history.map((r) => r._id === id ? { ...r, isFavorite: !r.isFavorite } : r),
-      }))
-    } catch {}
+      const { data } = await api.patch('/resume/' + id + '/favorite')
+      set(state => ({ history: state.history.map(entry => entry._id === id ? { ...entry, isFavorite: data.data.isFavorite } : entry) }))
+      return { success: true }
+    } catch (error) {
+      return { success: false, message: responseMessage(error, 'Unable to update the favorite.') }
+    }
   },
 
-  deleteResume: async (id) => {
+  deleteResume: async id => {
     try {
-      await api.delete(`/resume/${id}`)
-      set((s) => ({ history: s.history.filter((r) => r._id !== id) }))
-    } catch {}
+      await api.delete('/resume/' + id)
+      set(state => ({ history: state.history.filter(entry => entry._id !== id) }))
+      return { success: true }
+    } catch (error) {
+      return { success: false, message: responseMessage(error, 'Unable to delete the saved result.') }
+    }
   },
 }))
 

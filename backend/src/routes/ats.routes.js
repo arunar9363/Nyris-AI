@@ -1,9 +1,8 @@
 const express = require('express');
+const { checkATS } = require('../controllers/ats.controller');
+const { protect } = require('../middleware/auth.middleware');
+const { readUploads } = require('../middleware/upload.middleware');
+
 const router = express.Router();
-const atsController = require('../controllers/ats.controller');
-const { optionalAuth } = require('../middleware/auth.middleware');
-const upload = require('../middleware/upload.middleware');
-
-router.post('/check', optionalAuth, upload.single('resumeFile'), atsController.checkATS);
-
+router.post('/check', protect, readUploads('resumeFile'), checkATS);
 module.exports = router;

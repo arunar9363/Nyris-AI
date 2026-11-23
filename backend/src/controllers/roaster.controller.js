@@ -1,47 +1,26 @@
-const path = require('path');
-const groqService = require('../services/groq.service');
-const { extractTextFromPDF, extractTextFromTXT, cleanupFile } = require('../utils/pdfParser');
+const groq = require('../services/groq.service');
+const { reviewResume } = require('../services/roaster.service');
+const { readDocument } = require('../utils/pdfParser');
 const Resume = require('../models/Resume.model');
 
 exports.roastResume = async (req, res, next) => {
-  let uploadedFilePath = null;
   try {
-    let resumeText = '';
-    if (req.file) {
-      uploadedFilePath = req.file.path;
-      const ext = path.extname(req.file.originalname).toLowerCase();
-      resumeText = ext === '.pdf'
-        ? await extractTextFromPDF(uploadedFilePath)
-        : extractTextFromTXT(uploadedFilePath);
-    } else if (req.body.resumeText) {
-      resumeText = req.body.resumeText;
+    const body = req.body || {};
+    const resumeText = await readDocument(req.files?.resumeFile, body.resumeText, { label: 'resume' });
+    const jobDescription = await readDocument(null, body.jobDescription, { label: 'job description', optional: true });
+    const roastContent = reviewResume({ resumeText, jobDescription, targetRole: body.targetRole, tone: body.tone });
+    if (body.enhance === true || body.enhance === 'true') {
+      try {
+        const enhancement = await groq.roastResume({ resumeText, targetRole: roastContent.targetRole, tone: roastContent.tone });
+        roastContent.coachingNote = enhancement.seriousFeedback;
+        roastContent.coachingStatus = enhancement.seriousFeedback ? 'included' : 'unavailable';
+      } catch {
+        roastContent.coachingStatus = 'unavailable';
+      }
     }
-
-    if (!resumeText.trim()) {
-      return res.status(400).json({ success: false, message: 'Resume content is required.' });
-    }
-
-    const result = await groqService.roastResume({ resumeText });
-
-    if (req.user) {
-      await Resume.create({
-        userId: req.user._id,
-        type: 'roasted',
-        title: 'Resume Roast',
-        originalResumeText: resumeText,
-        roastContent: {
-          funnyRoast: result.funnyRoast,
-          seriousFeedback: result.seriousFeedback,
-          mistakesBreakdown: result.mistakesBreakdown || [],
-          improvementTips: result.improvementTips || [],
-        },
-      });
-    }
-
-    res.json({ success: true, data: result });
+    await Resume.create({ userId: req.user._id, type: 'roasted', title: 'Resume Roast', roastContent });
+    res.set('Cache-Control', 'private, no-store').json({ success: true, data: roastContent });
   } catch (error) {
     next(error);
-  } finally {
-    if (uploadedFilePath) cleanupFile(uploadedFilePath);
   }
 };

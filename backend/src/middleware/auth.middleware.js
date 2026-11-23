@@ -1,47 +1,29 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
+const httpError = require('../utils/httpError');
 
-const protect = async (req, res, next) => {
-  try {
-    let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      token = req.headers.authorization.split(' ')[1];
+function authenticate(required) {
+  return async (req, res, next) => {
+    const header = req.headers.authorization;
+    if (!header && !required) return next();
+
+    const token = /^Bearer (\S+)$/.exec(header || '')?.[1];
+    let id;
+    try {
+      const claims = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+      id = claims.id;
+    } catch {
+      return next(httpError(401, 'Please sign in to continue.'));
     }
-
-    if (!token) {
-      return res.status(401).json({ success: false, message: 'Not authorized. Token missing.' });
+    if (!/^[a-f\d]{24}$/i.test(id || '')) return next(httpError(401, 'Please sign in to continue.'));
+    try {
+      req.user = await User.findById(id);
+      if (!req.user) return next(httpError(401, 'This account no longer exists.'));
+      next();
+    } catch (error) {
+      next(error);
     }
+  };
+}
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'User no longer exists.' });
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    return res.status(401).json({ success: false, message: 'Not authorized. Invalid token.' });
-  }
-};
-
-const optionalAuth = async (req, res, next) => {
-  try {
-    let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      token = req.headers.authorization.split(' ')[1];
-    }
-
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id);
-      if (user) req.user = user;
-    }
-    next();
-  } catch (error) {
-    next();
-  }
-};
-
-module.exports = { protect, optionalAuth };
+module.exports = { protect: authenticate(true), optionalAuth: authenticate(false) };

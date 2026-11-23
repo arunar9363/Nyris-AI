@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { User, Mail, Lock, Eye, EyeOff, GraduationCap, UserPlus, ChevronDown } from 'lucide-react'
 import useAuthStore from '../store/authStore'
@@ -23,6 +23,7 @@ const EDU_LEVELS = [
 
 export default function SignupPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { signup, isLoading, error, clearError } = useAuthStore()
   const { theme } = useUIStore()
   const [form, setForm] = useState({
@@ -47,22 +48,22 @@ export default function SignupPage() {
       return setLocalError('Password must be at least 6 characters.')
     const { confirmPassword, ...payload } = form
     const result = await signup(payload)
-    if (result.success) navigate('/dashboard')
+    if (result.success) navigate(location.state?.from || '/dashboard', { replace: true })
   }
 
   const displayError = localError || error
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-mesh">
+    <div className="bg-mesh relative flex min-h-screen items-center justify-center px-3 py-5 sm:px-4 sm:py-12">
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139,92,246,0.1), transparent)' }} />
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-lg">
-        <div className="card p-8">
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-block mb-4">
-              <img src={theme === 'dark' ? logoDark : logoLight} alt="Nyris" className="h-9 mx-auto" />
+        <div className="card p-4 sm:p-8">
+          <div className="mb-4 text-center sm:mb-8">
+            <Link to="/" className="mb-2 inline-block sm:mb-4">
+              <img src={theme === 'dark' ? logoDark : logoLight} alt="Nyris" className="mx-auto h-6 w-auto sm:h-9" />
             </Link>
-            <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+            <h1 className="mb-1 text-xl font-bold sm:text-2xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
               Create your account
             </h1>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -78,7 +79,7 @@ export default function SignupPage() {
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Name */}
             <div>
               <label className="label">Full Name *</label>
@@ -113,7 +114,8 @@ export default function SignupPage() {
 
             {/* Degree + Branch */}
             {(form.educationLevel === 'ug' || form.educationLevel === 'pg') && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="grid grid-cols-2 gap-3">
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                className="grid gap-2.5 min-[420px]:grid-cols-2 sm:gap-3">
                 <div>
                   <label className="label">Degree</label>
                   <div className="relative">
@@ -139,15 +141,16 @@ export default function SignupPage() {
             )}
 
             {/* Password */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-2.5 min-[420px]:grid-cols-2 sm:gap-3">
               <div>
                 <label className="label">Password *</label>
                 <div className="relative">
                   <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                   <input name="password" type={showPass ? 'text' : 'password'} value={form.password}
-                    onChange={handleChange} className="input pl-10 pr-9" placeholder="Min 6 chars" />
+                    onChange={handleChange} className="input pl-10 pr-10" placeholder="Min 6 chars" />
                   <button type="button" onClick={() => setShowPass((s) => !s)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
+                    aria-label={showPass ? 'Hide passwords' : 'Show passwords'}
+                    className="absolute inset-y-0 right-0 flex w-10 items-center justify-center" style={{ color: 'var(--text-muted)' }}>
                     {showPass ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
                 </div>
@@ -162,7 +165,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary w-full justify-center py-3 text-base rounded-xl mt-2">
+            <button type="submit" disabled={isLoading} className="btn-primary mt-1 w-full justify-center py-2 sm:mt-2 sm:py-3 sm:text-base">
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -174,9 +177,9 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-3 text-center text-sm sm:mt-5" style={{ color: 'var(--text-secondary)' }}>
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold hover:underline" style={{ color: 'var(--accent-blue)' }}>Sign in</Link>
+            <Link to="/login" state={location.state} className="font-semibold hover:underline" style={{ color: 'var(--accent-blue)' }}>Sign in</Link>
           </p>
         </div>
       </motion.div>

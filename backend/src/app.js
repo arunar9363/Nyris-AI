@@ -3,7 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
+const mongoose = require('mongoose');
+const httpError = require('./utils/httpError');
 
 const authRoutes = require('./routes/auth.routes');
 const resumeRoutes = require('./routes/resume.routes');
@@ -17,30 +18,29 @@ const app = express();
 // Security middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// ── CORS — allow deployed frontend + localhost ──
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
+const trustProxy = Number(process.env.TRUST_PROXY);
+if (Number.isInteger(trustProxy) && trustProxy > 0) app.set('trust proxy', trustProxy);
+
+const allowedOrigins = new Set([
   'https://nyris.in',
   'https://www.nyris.in',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+]);
+if (process.env.NODE_ENV !== 'production') {
+  allowedOrigins.add('http://localhost:5174');
+  allowedOrigins.add('http://127.0.0.1:5174');
+}
+for (const candidate of (process.env.FRONTEND_URL || '').split(',')) {
+  if (candidate.trim()) allowedOrigins.add(new URL(candidate.trim()).origin);
+}
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow no-origin requests (Postman, curl, mobile)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn(`CORS blocked origin: ${origin}`);
-    return callback(new Error(`CORS blocked: ${origin}`));
+    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    return callback(httpError(403, 'This frontend origin is not allowed.'));
   },
-  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Resume-Access'],
 }));
-
-// Handle preflight for all routes
-app.options('*', cors());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -55,19 +55,22 @@ const aiLimiter = rateLimit({
   max: 10,
   message: { success: false, message: 'AI request limit reached. Please wait a moment.' },
 });
-app.use('/api/resume', aiLimiter);
+app.use('/api/resume/optimize', aiLimiter);
+app.use('/api/roaster/roast', aiLimiter);
+app.use('/api/resume/extract', rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  message: { success: false, message: 'Please wait a minute before reading another file.' },
+}));
 
 // Body parsing
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '256kb' }));
+app.use(express.urlencoded({ extended: false, limit: '256kb' }));
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-
-// Static uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -81,6 +84,10 @@ app.use('/api/feedback', feedbackRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Nyris AI API is running', timestamp: new Date().toISOString() });
 });
+app.get('/api/ready', (req, res) => {
+  const database = mongoose.connection.readyState === 1;
+  res.status(database ? 200 : 503).json({ success: database, services: { database, groqConfigured: !!process.env.GROQ_API_KEY } });
+});
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -89,12 +96,14 @@ app.use('*', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  const statusCode = err.statusCode || 500;
+  if (res.headersSent) return next(err);
+  if (err.code === 11000) return res.status(409).json({ success: false, message: 'That entry already exists.' });
+  const validationError = ['ValidationError', 'CastError'].includes(err.name);
+  const statusCode = err.statusCode || err.status || (validationError ? 400 : 500);
+  if (statusCode >= 500) console.error(`Nyris request failed (${err.name}, ${statusCode}).`);
   res.status(statusCode).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    message: statusCode < 500 || err.expose ? err.message : 'Something went wrong. Please try again.',
   });
 });
 

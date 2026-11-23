@@ -1,18 +1,19 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
 import { Upload, FileText, X, CheckCircle, Circle } from 'lucide-react'
 
 /* ─── ATS Animated Circle ─── */
-export function ATSCircle({ score = 0, size = 140 }) {
+export function ATSCircle({ score = 0, size = 140, label = 'Readiness' }) {
   const radius = 52
   const circumference = 2 * Math.PI * radius
   const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444'
-  const label = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Needs Work'
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox="0 0 120 120" className="ats-circle -rotate-90">
+    <div className="flex flex-col items-center gap-1 sm:gap-2">
+      <div className="relative h-[var(--mobile-score-size)] w-[var(--mobile-score-size)] sm:h-[var(--score-size)] sm:w-[var(--score-size)]"
+        style={{ '--score-size': size + 'px', '--mobile-score-size': Math.round(size * .72) + 'px' }}>
+        <svg width={size} height={size} viewBox="0 0 120 120" className="ats-circle h-full w-full -rotate-90" aria-hidden="true">
           <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth="10" />
           <motion.circle
             cx="60" cy="60" r={radius}
@@ -29,7 +30,7 @@ export function ATSCircle({ score = 0, size = 140 }) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-3xl font-bold font-display"
+            className="font-display text-xl font-bold sm:text-3xl"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.4 }}
@@ -37,10 +38,10 @@ export function ATSCircle({ score = 0, size = 140 }) {
           >
             {score}
           </motion.span>
-          <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>/100</span>
+          <span className="text-[11px] font-semibold sm:text-xs" style={{ color: 'var(--text-muted)' }}>/100</span>
         </div>
       </div>
-      <span className="text-sm font-semibold" style={{ color }}>{label}</span>
+      <span className="text-xs font-semibold sm:text-sm" style={{ color }}>{label}</span>
     </div>
   )
 }
@@ -95,9 +96,15 @@ export function StepIndicator({ steps, currentStep }) {
 }
 
 /* ─── File Dropzone ─── */
-export function FileDropzone({ onDrop, file, onRemove, accept = { 'application/pdf': ['.pdf'], 'text/plain': ['.txt'] } }) {
+export function FileDropzone({ onDrop, file, onRemove, name = 'resume', formats = 'PDF or TXT', accept = { 'application/pdf': ['.pdf'], 'text/plain': ['.txt'] } }) {
+  const [rejection, setRejection] = useState('')
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles) => onDrop(acceptedFiles[0]),
+    onDropAccepted: files => { setRejection(''); onDrop(files[0]) },
+    onDropRejected: files => {
+      setRejection(files[0]?.errors.some(error => error.code === 'file-too-large')
+        ? 'Choose a file that is 5 MB or smaller.'
+        : 'Choose one supported file. Accepted formats are ' + formats + '.')
+    },
     accept,
     multiple: false,
     maxSize: 5 * 1024 * 1024,
@@ -108,10 +115,10 @@ export function FileDropzone({ onDrop, file, onRemove, accept = { 'application/p
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center gap-3 px-4 py-3 rounded-xl border"
+        className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 sm:gap-3 sm:rounded-xl sm:px-4 sm:py-3"
         style={{ borderColor: '#10b981', background: 'rgba(16,185,129,0.08)' }}
       >
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg sm:h-8 sm:w-8"
           style={{ background: 'rgba(16,185,129,0.2)' }}>
           <FileText size={16} style={{ color: '#10b981' }} />
         </div>
@@ -119,7 +126,8 @@ export function FileDropzone({ onDrop, file, onRemove, accept = { 'application/p
           <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{file.name}</p>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{(file.size / 1024).toFixed(1)} KB</p>
         </div>
-        <button onClick={onRemove} className="p-1 rounded-lg hover:bg-red-500/20 transition-colors">
+        <button type="button" aria-label={'Remove ' + name + ' file'} onClick={onRemove}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-red-500/20 sm:h-auto sm:w-auto sm:p-1">
           <X size={14} className="text-red-400" />
         </button>
       </motion.div>
@@ -127,27 +135,30 @@ export function FileDropzone({ onDrop, file, onRemove, accept = { 'application/p
   }
 
   return (
+    <div>
     <div
       {...getRootProps()}
-      className={`relative flex flex-col items-center justify-center gap-3 px-6 py-10 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 ${isDragActive ? 'scale-[1.01]' : ''}`}
+      className={`relative flex cursor-pointer items-center gap-2.5 rounded-xl border-2 border-dashed px-3 py-3 transition-all duration-200 sm:flex-col sm:justify-center sm:gap-3 sm:rounded-2xl sm:px-6 sm:py-10 ${isDragActive ? 'scale-[1.01]' : ''}`}
       style={{
         borderColor: isDragActive ? 'var(--accent-blue)' : 'var(--border)',
         background: isDragActive ? 'rgba(59,130,246,0.06)' : 'var(--bg-secondary)',
       }}
     >
       <input {...getInputProps()} />
-      <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 sm:rounded-2xl"
         style={{ background: 'rgba(59,130,246,0.1)' }}>
-        <Upload size={22} style={{ color: 'var(--accent-blue)' }} />
+        <Upload size={16} className="sm:h-[22px] sm:w-[22px]" style={{ color: 'var(--accent-blue)' }} />
       </div>
-      <div className="text-center">
+      <div className="min-w-0 sm:text-center">
         <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-          {isDragActive ? 'Drop it here!' : 'Drop your resume here'}
+          {isDragActive ? 'Drop it here' : 'Choose or drop your ' + name}
         </p>
         <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-          PDF or TXT · Max 5MB · or click to browse
+          {formats} · up to 5 MB
         </p>
       </div>
+    </div>
+    {rejection && <p className="resume-error mt-2" role="alert">{rejection}</p>}
     </div>
   )
 }

@@ -1,108 +1,84 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { FileText, Star, Trash2, Search, Filter } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { FileText, Search, Star, Trash2 } from 'lucide-react'
 import useResumeStore from '../store/resumeStore'
-import { SkeletonCard } from '../components/ui/index'
+import { SkeletonCard } from '../components/ui'
 
-const TYPE_LABELS = { optimized: 'Optimized', built: 'Built', ats_check: 'ATS Check', roasted: 'Roasted' }
-const TYPE_COLORS = { optimized: '#3b82f6', built: '#8b5cf6', ats_check: '#06b6d4', roasted: '#f59e0b' }
+const types = { optimized: 'Optimized', built: 'Built', ats_check: 'ATS check', roasted: 'Roast' }
 
 export default function HistoryPage() {
-  const { history, historyLoading, fetchHistory, toggleFavorite, deleteResume } = useResumeStore()
-  const [search, setSearch] = useState('')
+  const { history, historyLoading, historyError, fetchHistory, toggleFavorite, deleteResume } = useResumeStore()
+  const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
-
+  const [pending, setPending] = useState(false)
+  const [actionError, setActionError] = useState('')
   useEffect(() => { fetchHistory() }, [fetchHistory])
 
-  const filtered = history
-    .filter((r) => filter === 'all' || (filter === 'favorites' ? r.isFavorite : r.type === filter))
-    .filter((r) => !search || r.title?.toLowerCase().includes(search.toLowerCase()))
+  const visible = history.filter(item =>
+    (filter === 'all' || (filter === 'favorites' ? item.isFavorite : item.type === filter)) &&
+    (item.title || '').toLowerCase().includes(query.trim().toLowerCase()),
+  )
+
+  async function update(id, action) {
+    setPending(true)
+    setActionError('')
+    try {
+      const result = await action(id)
+      if (!result.success) setActionError(result.message)
+    } finally {
+      setPending(false)
+    }
+  }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
-          My Resumes
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{history.length} total resumes saved</p>
-      </motion.div>
+    <div className="page-spacing mx-auto max-w-4xl sm:px-6">
+      <h1 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--text-primary)' }}>Saved results</h1>
+      <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>Open or download any of your 50 most recent saved items.</p>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} className="input pl-10"
-            placeholder="Search resumes..." />
+      <div className="my-3 flex flex-col gap-2 min-[380px]:flex-row sm:my-6 sm:gap-3">
+        <div className="relative min-w-0 flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+          <input type="search" aria-label="Search saved results" value={query} onChange={event => setQuery(event.target.value)}
+            className="input pl-9" placeholder="Search by title" />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {['all', 'favorites', 'optimized', 'built', 'ats_check', 'roasted'].map((f) => (
-            <button key={f} onClick={() => setFilter(f)}
-              className="px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all"
-              style={{
-                borderColor: filter === f ? 'var(--accent-blue)' : 'var(--border)',
-                background: filter === f ? 'rgba(59,130,246,0.1)' : 'transparent',
-                color: filter === f ? 'var(--accent-blue)' : 'var(--text-muted)',
-              }}>
-              {f === 'all' ? 'All' : f === 'favorites' ? '⭐ Favorites' : TYPE_LABELS[f]}
-            </button>
-          ))}
-        </div>
+        <select className="input min-[380px]:max-w-32 sm:max-w-[190px]" aria-label="Filter saved results" value={filter} onChange={event => setFilter(event.target.value)}>
+          <option value="all">All results</option>
+          <option value="favorites">Favorites</option>
+          {Object.entries(types).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        </select>
       </div>
 
-      {historyLoading ? (
-        <div className="space-y-3">{[1,2,3,4].map((i) => <SkeletonCard key={i} lines={2} />)}</div>
-      ) : filtered.length === 0 ? (
-        <div className="card p-12 text-center">
-          <FileText size={36} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
-          <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>No resumes found</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-            {search ? 'Try a different search term' : 'Create a resume to see it here'}
-          </p>
-        </div>
+      {actionError && <p className="resume-error mb-4" role="alert">{actionError}</p>}
+      {historyError ? <div className="card p-3.5 sm:p-5">
+        <p className="resume-error" role="alert">{historyError}</p>
+        <button type="button" className="btn-secondary mt-3" onClick={fetchHistory}>Retry</button>
+      </div> : historyLoading ? (
+        <div className="space-y-3">{['first', 'second', 'third'].map(key => <SkeletonCard key={key} lines={2} />)}</div>
+      ) : visible.length ? (
+        <ul className="space-y-2 sm:space-y-3">
+          {visible.map(item => <li key={item._id} className="card flex items-center gap-1.5 p-2.5 sm:gap-3 sm:p-4">
+            <FileText size={16} className="shrink-0 text-blue-500 sm:h-[19px] sm:w-[19px]" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <Link className="block truncate font-medium hover:underline" to={'/history/' + item._id} style={{ color: 'var(--text-primary)' }}>{item.title}</Link>
+              <div className="mt-1 flex flex-wrap gap-x-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <span>{types[item.type]}</span>
+                <time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString()}</time>
+                {typeof item.atsScore === 'number' && <span>Readiness {item.atsScore}/100</span>}
+              </div>
+            </div>
+            <button type="button" aria-label={item.isFavorite ? 'Remove from favorites' : 'Add to favorites'} aria-pressed={item.isFavorite} disabled={pending}
+              className="btn-ghost h-9 w-9 shrink-0 justify-center p-0 sm:h-auto sm:w-auto sm:p-2" onClick={() => update(item._id, toggleFavorite)}>
+              <Star size={17} fill={item.isFavorite ? 'currentColor' : 'none'} className={item.isFavorite ? 'text-amber-500' : ''} />
+            </button>
+            <button type="button" aria-label="Delete saved result" className="btn-ghost h-9 w-9 shrink-0 justify-center p-0 text-red-400 sm:h-auto sm:w-auto sm:p-2" disabled={pending}
+              onClick={() => { if (window.confirm('Delete this saved result?')) update(item._id, deleteResume) }}>
+              <Trash2 size={17} />
+            </button>
+          </li>)}
+        </ul>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((resume, i) => (
-            <motion.div key={resume._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="card p-5 flex items-center gap-4 hover:border-blue-500/20 transition-all">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ background: `${TYPE_COLORS[resume.type] || '#3b82f6'}15` }}>
-                <FileText size={18} style={{ color: TYPE_COLORS[resume.type] || '#3b82f6' }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{resume.title}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
-                    style={{ background: `${TYPE_COLORS[resume.type]}15`, color: TYPE_COLORS[resume.type] }}>
-                    {TYPE_LABELS[resume.type]}
-                  </span>
-                  {resume.isFavorite && <Star size={11} style={{ color: '#f59e0b', fill: '#f59e0b' }} />}
-                </div>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    {new Date(resume.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                  {resume.atsScore && (
-                    <span className="text-xs font-semibold" style={{ color: '#10b981' }}>ATS: {resume.atsScore}</span>
-                  )}
-                  {resume.templateId && (
-                    <span className="text-xs capitalize" style={{ color: 'var(--text-muted)' }}>{resume.templateId}</span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button onClick={() => toggleFavorite(resume._id)}
-                  className="p-2 rounded-lg hover:bg-yellow-500/15 transition-colors"
-                  title={resume.isFavorite ? 'Remove from favorites' : 'Add to favorites'}>
-                  <Star size={15} style={{ color: resume.isFavorite ? '#f59e0b' : 'var(--text-muted)', fill: resume.isFavorite ? '#f59e0b' : 'none' }} />
-                </button>
-                <button onClick={() => { if (window.confirm('Delete this resume?')) deleteResume(resume._id) }}
-                  className="p-2 rounded-lg hover:bg-red-500/15 transition-colors text-red-400">
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
+        <div className="card p-4 text-center sm:p-8" style={{ color: 'var(--text-secondary)' }}>
+          {query || filter !== 'all' ? 'No results match this search.' : 'Your saved resumes and reports will appear here.'}
         </div>
       )}
     </div>

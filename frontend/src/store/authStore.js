@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import api from '../lib/api'
+import api, { responseMessage } from '../lib/api'
+import useResumeStore from './resumeStore'
 
 const getStoredUser = () => {
   try {
@@ -23,7 +24,7 @@ const useAuthStore = create((set, get) => ({
       set({ user: data.user, token: data.token, isLoading: false })
       return { success: true }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed'
+      const msg = responseMessage(err, 'Could not sign in. Check that the Nyris API is running.')
       set({ error: msg, isLoading: false })
       return { success: false, message: msg }
     }
@@ -38,7 +39,7 @@ const useAuthStore = create((set, get) => ({
       set({ user: data.user, token: data.token, isLoading: false })
       return { success: true }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Signup failed'
+      const msg = responseMessage(err, 'Could not create the account. Check that the Nyris API is running.')
       set({ error: msg, isLoading: false })
       return { success: false, message: msg }
     }
@@ -47,6 +48,7 @@ const useAuthStore = create((set, get) => ({
   logout: () => {
     localStorage.removeItem('nyris_token')
     localStorage.removeItem('nyris_user')
+    useResumeStore.getState().clearPrivateResults()
     set({ user: null, token: null })
   },
 

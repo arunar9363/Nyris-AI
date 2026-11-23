@@ -25,7 +25,7 @@ exports.updateProfile = async (req, res, next) => {
 exports.getFavorites = async (req, res, next) => {
   try {
     const resumes = await Resume.find({ userId: req.user._id, isFavorite: true })
-      .select('-optimizedHtml -originalResumeText')
+      .select('-optimizedHtml -resumeData -originalResumeText -jobDescription -personalInfo -sessionId -atsReport -roastContent')
       .sort({ updatedAt: -1 });
     res.json({ success: true, data: resumes });
   } catch (error) { next(error); }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff, LogIn, Sparkles } from 'lucide-react'
 import useAuthStore from '../store/authStore'
@@ -9,6 +9,7 @@ import useUIStore from '../store/uiStore'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login, isLoading, error, clearError } = useAuthStore()
   const { theme } = useUIStore()
   const [form, setForm] = useState({ email: '', password: '' })
@@ -25,13 +26,13 @@ export default function LoginPage() {
     e.preventDefault()
     if (!form.email || !form.password) return setLocalError('Please fill all fields.')
     const result = await login(form.email, form.password)
-    if (result.success) navigate('/dashboard')
+    if (result.success) navigate(location.state?.from || '/dashboard', { replace: true })
   }
 
   const displayError = localError || error
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-mesh">
+    <div className="bg-mesh relative flex min-h-screen items-center justify-center px-3 py-5 sm:px-4 sm:py-0">
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(59,130,246,0.1), transparent)' }} />
 
       <motion.div
@@ -40,13 +41,13 @@ export default function LoginPage() {
         className="relative z-10 w-full max-w-md"
       >
         {/* Card */}
-        <div className="card p-8">
+        <div className="card p-4 sm:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-block mb-4">
-              <img src={theme === 'dark' ? logoDark : logoLight} alt="Nyris" className="h-9 mx-auto" />
+          <div className="mb-4 text-center sm:mb-8">
+            <Link to="/" className="mb-2 inline-block sm:mb-4">
+              <img src={theme === 'dark' ? logoDark : logoLight} alt="Nyris" className="mx-auto h-6 w-auto sm:h-9" />
             </Link>
-            <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+            <h1 className="mb-1 text-xl font-bold sm:text-2xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
               Welcome back
             </h1>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -66,7 +67,7 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-5">
             <div>
               <label className="label">Email</label>
               <div className="relative">
@@ -83,13 +84,14 @@ export default function LoginPage() {
                 <input name="password" type={showPass ? 'text' : 'password'} value={form.password}
                   onChange={handleChange} className="input pl-10 pr-10" placeholder="••••••••" autoComplete="current-password" />
                 <button type="button" onClick={() => setShowPass((s) => !s)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
+                  aria-label={showPass ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center" style={{ color: 'var(--text-muted)' }}>
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary w-full justify-center py-3 text-base rounded-xl">
+            <button type="submit" disabled={isLoading} className="btn-primary w-full justify-center py-2 sm:py-3 sm:text-base">
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -101,16 +103,16 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-3 text-center sm:mt-6">
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Don't have an account?{' '}
-              <Link to="/signup" className="font-semibold hover:underline" style={{ color: 'var(--accent-blue)' }}>
+              <Link to="/signup" state={location.state} className="font-semibold hover:underline" style={{ color: 'var(--accent-blue)' }}>
                 Create one free
               </Link>
             </p>
           </div>
 
-          <div className="mt-4 pt-4 border-t text-center" style={{ borderColor: 'var(--border)' }}>
+          <div className="mt-3 border-t pt-3 text-center sm:mt-4 sm:pt-4" style={{ borderColor: 'var(--border)' }}>
             <Link to="/optimizer" className="text-xs flex items-center justify-center gap-1.5 hover:underline"
               style={{ color: 'var(--text-muted)' }}>
               <Sparkles size={11} /> Continue without account (Optimizer only)

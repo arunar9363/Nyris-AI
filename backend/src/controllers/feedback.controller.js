@@ -3,15 +3,15 @@ const Feedback = require('../models/Feedback.model')
 // POST /api/feedback
 exports.submitFeedback = async (req, res, next) => {
   try {
-    const { name, email, feedbackType, message, rating } = req.body
+    const { name, email, feedbackType, message, rating } = req.body || {}
 
-    if (!message || message.trim().length < 10) {
-      return res.status(400).json({ success: false, message: 'Please write at least 10 characters of feedback.' })
+    if (typeof message !== 'string' || message.trim().length < 10 || message.trim().length > 1000) {
+      return res.status(400).json({ success: false, message: 'Write between 10 and 1,000 characters of feedback.' })
     }
 
     const feedback = await Feedback.create({
-      name: name?.trim() || 'User',
-      email: email?.trim() || '',
+      name: typeof name === 'string' && name.trim() ? name.trim() : 'User',
+      email: typeof email === 'string' ? email.trim() : '',
       feedbackType: feedbackType || 'general',
       message: message.trim(),
       rating: rating || null,

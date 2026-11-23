@@ -1,125 +1,153 @@
-const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
-const fs = require('fs');
-const path = require('path');
+const PDFDocument = require('pdfkit');
+const fontkit = require('fontkit');
+const path = require('node:path');
+const { renderText } = require('./resumeDocument');
+const httpError = require('../utils/httpError');
 
-const TEMPLATES_DIR = path.join(__dirname, '../../templates');
-const OUTPUT_DIR = path.join(__dirname, '../../uploads/pdfs');
+const needsUnicodeFont = /[^\x20-\x7e\u00a0-\u00ff\r\n\t\u2013\u2014\u2018-\u201e\u2022\u2026\u20ac]/u;
 
-if (!fs.existsSync(OUTPUT_DIR)) {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+function resumeFonts(document) {
+  const text = renderText(document);
+  if (!needsUnicodeFont.test(text)) {
+    return document.theme.serif ? ['Times-Roman', 'Times-Bold', 'Times-Italic'] : ['Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique'];
+  }
+  const directory = path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'standard_fonts');
+  const embedded = ['Regular', 'Bold', 'Italic'].map(face => path.join(directory, 'LiberationSans-' + face + '.ttf'));
+  const font = fontkit.openSync(embedded[0]);
+  const characters = [...new Set(text.replace(/\s/g, ''))];
+  const covers = candidate => characters.every(character => candidate.hasGlyphForCodePoint(character.codePointAt(0)));
+  if (covers(font)) return embedded;
+
+  const custom = process.env.RESUME_PDF_FONT;
+  if (custom && covers(fontkit.openSync(custom))) return [custom, custom, custom];
+  throw httpError(422, 'Use Word or plain text for characters outside the available PDF fonts.');
 }
 
-/**
- * Simple template engine - replaces {{var}}, {{#if}}, {{#each}} blocks
- */
-const renderTemplate = (template, data) => {
-  let html = template;
+function renderPdf(document) {
+  const { name, contacts, sections, settings, theme } = document;
+  const [regular, bold, italic] = resumeFonts(document);
+  const size = theme.bodySize;
+  const left = theme.margin;
+  const linkColor = '#174d93';
 
-  // Handle {{#each array}} blocks
-  html = html.replace(/\{\{#each (\w+(?:\.\w+)*)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, keyPath, block) => {
-    const keys = keyPath.split('.');
-    let arr = data;
-    for (const k of keys) arr = arr?.[k];
-    if (!Array.isArray(arr) || arr.length === 0) return '';
-    return arr.map((item, index) => {
-      let b = block;
-      // Replace @first
-      b = b.replace(/\{\{#unless @first\}\}([\s\S]*?)\{\{\/unless\}\}/g, index === 0 ? '' : '$1');
-      b = b.replace(/\{\{#if @first\}\}([\s\S]*?)\{\{\/if\}\}/g, index === 0 ? '$1' : '');
-      // Replace item properties
-      if (typeof item === 'string') {
-        b = b.replace(/\{\{this\}\}/g, item);
-      } else if (typeof item === 'object') {
-        Object.keys(item).forEach(k => {
-          const val = item[k];
-          // Nested #if inside each
-          b = b.replace(new RegExp(`\\{\\{#if ${k}\\}\\}([\\s\\S]*?)\\{\\{\\/if\\}\\}`, 'g'), val ? '$1' : '');
-          // Nested #each inside each (bullets)
-          b = b.replace(new RegExp(`\\{\\{#each ${k}\\}\\}([\\s\\S]*?)\\{\\{\\/each\\}\\}`, 'g'), (m, innerBlock) => {
-            if (!Array.isArray(val)) return '';
-            return val.map(v => innerBlock.replace(/\{\{this\}\}/g, v)).join('');
-          });
-          b = b.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), val ?? '');
-        });
+  return new Promise((resolve, reject) => {
+    const pdf = new PDFDocument({
+      size: settings.paperSize,
+      margin: left,
+      info: { Title: name + ' - Resume', Creator: 'Nyris AI' },
+    });
+    const chunks = [];
+    pdf.on('data', chunk => chunks.push(chunk));
+    pdf.on('end', () => resolve(Buffer.concat(chunks)));
+    pdf.on('error', reject);
+
+    const width = pdf.page.width - left * 2;
+    const ensureSpace = height => {
+      if (pdf.y + height > pdf.page.height - left) pdf.addPage();
+    };
+    const body = () => pdf.font(regular).fontSize(size).lineGap(theme.lineGap).fillColor('#171717');
+    const row = (value, meta, face, subtitle = '') => {
+      if (!value && !meta && !subtitle) return;
+      const right = meta ? Math.min(170, width * 0.37) : 0;
+      const titleWidth = right ? width - right - 10 : width;
+      const options = { width: titleWidth };
+      const heading = [value, subtitle].filter(Boolean).join('  |  ');
+      const titleHeight = heading ? body().font(face).heightOfString(heading, options) : 0;
+      const metaHeight = meta ? body().fontSize(size - 0.5).heightOfString(meta, { width: right }) : 0;
+      ensureSpace(Math.max(titleHeight, metaHeight) + 2);
+      const y = pdf.y;
+      if (subtitle) {
+        body().font(face).text(value, left, y, { ...options, continued: true });
+        pdf.font(italic).text('  |  ' + subtitle);
+      } else if (value) {
+        body().font(face).text(value, left, y, options);
       }
-      // Clean remaining {{...}} tags for missing props
-      b = b.replace(/\{\{#if \w+\}\}[\s\S]*?\{\{\/if\}\}/g, '');
-      b = b.replace(/\{\{#unless \w+\}\}[\s\S]*?\{\{\/unless\}\}/g, '');
-      return b;
-    }).join('');
+      const afterHeading = value ? pdf.y : y;
+      if (meta) body().fontSize(size - 0.5).text(meta, left + width - right, y, { width: right, align: 'right' });
+      pdf.x = left;
+      pdf.y = Math.max(afterHeading, y + metaHeight);
+    };
+    const links = (items, center) => {
+      if (!items.length) return;
+      const lines = [[]];
+      let used = 0;
+      const gap = '  |  ';
+      const measure = value => body().fontSize(size - 0.7).widthOfString(value);
+      for (const item of items) {
+        let line = lines.at(-1);
+        let needed = measure((line.length ? gap : '') + item.label);
+        if (used + needed > width && line.length) {
+          line = [];
+          lines.push(line);
+          used = 0;
+          needed = measure(item.label);
+        }
+        line.push(item);
+        used += needed;
+      }
+      for (const line of lines) {
+        ensureSpace(size + 4);
+        const y = pdf.y;
+        let x = center ? left + Math.max(0, (width - measure(line.map(item => item.label).join(gap))) / 2) : left;
+        const output = (value, url) => {
+          const labelWidth = measure(value);
+          body().fontSize(size - 0.7).fillColor(url ? linkColor : '#171717');
+          pdf.text(value, x, y, { lineBreak: false });
+          if (url && labelWidth) {
+            pdf.link(x, y, labelWidth, size + 1, url);
+            pdf.strokeColor(linkColor).lineWidth(0.4).moveTo(x, y + size + 0.5).lineTo(x + labelWidth, y + size + 0.5).stroke();
+          }
+          x += labelWidth;
+        };
+        line.forEach((item, index) => {
+          if (index) output(gap);
+          output(item.label, item.url);
+        });
+        pdf.x = left;
+        pdf.y = y + size + 3;
+      }
+    };
+
+    pdf.font(bold).fontSize(theme.nameSize).fillColor(theme.accent).text(name, { align: theme.align, width });
+    links(contacts, theme.align === 'center');
+    if (theme.headerRule) {
+      pdf.strokeColor(theme.accent).lineWidth(1.4).moveTo(left, pdf.y + 1).lineTo(left + width, pdf.y + 1).stroke();
+      pdf.y += 6;
+    }
+    pdf.moveDown(0.35);
+
+    for (const section of sections) {
+      ensureSpace(50);
+      pdf.moveDown(theme.space);
+      pdf.font(bold).fontSize(size + 0.7).fillColor(theme.headerRule ? theme.accent : '#171717')
+        .text(theme.caps || theme.smallCaps ? section.title.toUpperCase() : section.title, { width });
+      if (theme.rule) pdf.strokeColor(theme.rule).lineWidth(0.45).moveTo(left, pdf.y + 0.6).lineTo(left + width, pdf.y + 0.6).stroke();
+      pdf.y += theme.rule ? 5 : 3;
+      for (const item of section.items) {
+        ensureSpace(item.title || item.subtitle ? 38 : 17);
+        row(item.title, item.topMeta, bold, item.inlineSubtitle ? item.subtitle : '');
+        row(item.inlineSubtitle ? '' : item.subtitle, item.bottomMeta, italic);
+        if (item.inlineLinks && item.links?.length) {
+          body().font(bold).text(item.label, { width, continued: true });
+          body().text((item.text ? (item.labelSeparator || ': ') + item.text : '') + '  ·  ', { continued: true });
+          const [{ label, url }] = item.links;
+          body().fillColor(linkColor).text(label, { link: url, underline: true, continued: false });
+        } else if (item.label || item.text) {
+          if (item.label && item.text) {
+            body().font(bold).text(item.label, { width, continued: true });
+            body().text((item.labelSeparator || ': ') + item.text);
+          } else {
+            body().font(item.label ? bold : regular).text(item.label || item.text, { width });
+          }
+        }
+        for (const bullet of item.bullets || []) body().text('– ' + bullet, left + 9, pdf.y, { width: width - 9 });
+        pdf.x = left;
+        if (!item.inlineLinks) links(item.links || [], false);
+        pdf.y += item.title ? theme.itemSpace : 1.2;
+      }
+    }
+    pdf.end();
   });
+}
 
-  // Handle top-level {{#if key}} blocks
-  html = html.replace(/\{\{#if (\w+(?:\.\w+)*)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, keyPath, block) => {
-    const keys = keyPath.split('.');
-    let val = data;
-    for (const k of keys) val = val?.[k];
-    return val && (Array.isArray(val) ? val.length > 0 : true) ? block : '';
-  });
-
-  // Handle {{#unless key}} blocks
-  html = html.replace(/\{\{#unless (\w+)\}\}([\s\S]*?)\{\{\/unless\}\}/g, (match, key, block) => {
-    return data[key] ? '' : block;
-  });
-
-  // Replace simple {{key}} and {{key.subkey}}
-  html = html.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (match, keyPath) => {
-    const keys = keyPath.split('.');
-    let val = data;
-    for (const k of keys) val = val?.[k];
-    return val !== undefined && val !== null ? String(val) : '';
-  });
-
-  return html;
-};
-
-/**
- * Generate HTML from template + data
- */
-const generateHtml = (templateId, data) => {
-  const templatePath = path.join(TEMPLATES_DIR, `${templateId}.html`);
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`Template '${templateId}' not found`);
-  }
-  const template = fs.readFileSync(templatePath, 'utf-8');
-  return renderTemplate(template, data);
-};
-
-/**
- * Convert HTML string to PDF using Puppeteer
- */
-const htmlToPdf = async (html, filename) => {
-  const outputPath = path.join(OUTPUT_DIR, filename);
-  let browser;
-  try {
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    await page.pdf({
-      path: outputPath,
-      format: 'Letter',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-    });
-    return outputPath;
-  } finally {
-    if (browser) await browser.close();
-  }
-};
-
-/**
- * Main export: generate PDF from template + data
- */
-exports.generateResumePdf = async (templateId, resumeData, filename) => {
-  const html = generateHtml(templateId, resumeData);
-  const pdfPath = await htmlToPdf(html, filename || `resume-${Date.now()}.pdf`);
-  return { html, pdfPath };
-};
-
-exports.generateHtml = generateHtml;
+module.exports = { renderPdf };

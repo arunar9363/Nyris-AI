@@ -1,161 +1,203 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Flame, RefreshCw, AlertCircle, CheckCircle, Lightbulb, Star } from 'lucide-react'
-import useResumeStore from '../store/resumeStore'
-import { FileDropzone, ProgressBar } from '../components/ui/index'
+import { Flame } from 'lucide-react'
+import ReviewWizard from '../components/ReviewWizard'
+import { ReportActions, ReportMetrics, ReportNavigation, ReportPanel } from '../components/ReportWorkspace'
+
+const bulletStatus = { 'needs-work': 'Needs an edit', solid: 'Solid', strong: 'Strong evidence' }
+const actionLabels = { specific: 'Specific action', vague: 'Vague opening', unclear: 'Action to clarify' }
 
 export default function RoasterPage() {
-  const { roastResume, roastResult, roastLoading } = useResumeStore()
-  const [file, setFile] = useState(null)
-  const [resumeText, setResumeText] = useState('')
-  const [error, setError] = useState('')
+  return <ReviewWizard tool="roaster" Result={RoastResult} />
+}
 
-  const handleRoast = async () => {
-    if (!file && !resumeText.trim()) return setError('Please upload your resume or paste text.')
-    setError('')
-    const result = await roastResume(file, resumeText)
-    if (!result.success) setError(result.message)
-  }
-
-  const handleReset = () => {
-    setFile(null); setResumeText(''); setError('')
-    useResumeStore.setState({ roastResult: null })
-  }
+function BulletReview({ bullets, summary }) {
+  const [section, setSection] = useState('all')
+  const [status, setStatus] = useState('all')
+  const sections = [...new Set(bullets.map(bullet => bullet.section))]
+  const visible = bullets.filter(bullet => (section === 'all' || bullet.section === section) && (status === 'all' || bullet.status === status))
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4 border"
-          style={{ background: 'rgba(245,158,11,0.1)', borderColor: 'rgba(245,158,11,0.3)', color: '#fbbf24' }}>
-          <Flame size={12} /> Resume Roaster
-        </div>
-        <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
-          Get Roasted. Get Better. 🔥
-        </h1>
-        <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
-          Brutally honest (and funny) feedback on your resume — because tough love works.
+    <ReportPanel title="Bullet-by-bullet review" description="Use the question beside each bullet to recover its missing detail. Fill any rewrite brackets with facts you can support.">
+      <div className="mb-4 mt-4 grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
+        <label>
+          <span className="label">Resume section</span>
+          <select className="input" value={section} onChange={event => setSection(event.target.value)}>
+            <option value="all">All sections</option>
+            {sections.map(name => <option key={name}>{name}</option>)}
+          </select>
+        </label>
+        <label>
+          <span className="label">Writing quality</span>
+          <select className="input" value={status} onChange={event => setStatus(event.target.value)}>
+            <option value="all">All bullets</option>
+            {Object.entries(bulletStatus).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </select>
+        </label>
+        <p className="pb-2 text-xs" role="status" style={{ color: 'var(--text-secondary)' }}>
+          {visible.length} of {bullets.length} available bullets{summary.bulletsAnalyzed > bullets.length ? ' · ' + summary.bulletsAnalyzed + ' analyzed' : ''}
         </p>
-      </motion.div>
-
-      {!roastResult ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card p-8 space-y-6">
-          <div className="p-4 rounded-xl border" style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.2)' }}>
-            <p className="text-sm" style={{ color: '#fbbf24' }}>
-              🔥 <strong>Warning:</strong> Our AI roaster is honest but never mean-spirited. Expect humor + real actionable feedback.
-            </p>
-          </div>
-
-          <FileDropzone onDrop={(f) => { setFile(f); setResumeText('') }} file={file} onRemove={() => setFile(null)} />
-
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>OR paste text</span>
-            <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-          </div>
-
-          <textarea value={resumeText} onChange={(e) => { setResumeText(e.target.value); setFile(null) }}
-            className="input resize-none text-xs font-mono" rows={8} placeholder="Paste resume text here..." />
-
-          {error && (
-            <p className="text-sm px-4 py-2.5 rounded-xl"
-              style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}>
-              {error}
-            </p>
-          )}
-
-          {roastLoading ? (
-            <div className="py-4">
-              <ProgressBar value={60} stage="AI is preparing your roast... 🔥" />
+      </div>
+      {visible.length ? <ol className="space-y-4">
+        {visible.map(bullet => (
+          <li key={bullet.index} className="space-y-3 rounded-lg border p-4" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold">{bullet.section} · Bullet {bullet.index}</h3>
+              <span className={'text-xs font-semibold ' + (bullet.status === 'needs-work' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')}>{bulletStatus[bullet.status] || bullet.status}</span>
             </div>
-          ) : (
-            <button onClick={handleRoast}
-              className="w-full justify-center py-3 text-base rounded-xl font-semibold text-white flex items-center gap-2 transition-all hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg,#d97706,#dc2626)', boxShadow: '0 4px 20px rgba(220,38,38,0.35)' }}>
-              <Flame size={18} /> Roast My Resume
-            </button>
-          )}
-        </motion.div>
-      ) : (
-        <RoastResult result={roastResult} onReset={handleReset} />
-      )}
-    </div>
+            <blockquote className="break-words border-l-2 border-blue-500/50 pl-3 text-sm leading-relaxed">{bullet.text}</blockquote>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+              {[
+                actionLabels[bullet.action],
+                bullet.hasScope ? 'Scope shown' : 'Scope to clarify',
+                bullet.hasOutcome ? 'Outcome shown' : 'Outcome to clarify',
+                bullet.hasNumbers ? 'Number present' : null,
+              ].filter(Boolean).map(label => <li key={label}>{label}</li>)}
+            </ul>
+            {!!bullet.matchedTerms?.length && <p className="break-words text-xs" style={{ color: 'var(--text-secondary)' }}>Job terms in this bullet <strong>{bullet.matchedTerms.join(', ')}</strong></p>}
+            {!!bullet.issues?.length && (
+              <ul className="space-y-2 border-t pt-3 text-sm" style={{ borderColor: 'var(--border)' }}>
+                {bullet.issues.map((issue, index) => <li key={issue.id || index}>
+                  <p className="font-medium">{issue.title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{issue.detail}</p>
+                </li>)}
+              </ul>
+            )}
+            {bullet.coaching && (
+              <div className="space-y-2 rounded-lg p-3 text-sm" style={{ background: 'var(--bg-primary)' }}>
+                {bullet.coaching.question && <p>{bullet.coaching.question}</p>}
+                {bullet.coaching.scaffold && <p className="break-words text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{bullet.coaching.scaffold}</p>}
+              </div>
+            )}
+          </li>
+        ))}
+      </ol> : <p className="py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>No available bullets match these filters.</p>}
+    </ReportPanel>
   )
 }
 
-function RoastResult({ result, onReset }) {
-  const { funnyRoast, seriousFeedback, mistakesBreakdown, improvementTips, overallRating, verdict } = result
+function SectionReview({ sections }) {
+  return (
+    <ReportPanel title="Coverage by resume section" description="See where your existing bullets give the clearest picture of your work.">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {sections.map(section => (
+          <div key={section.name} className="space-y-3 rounded-lg border p-4" style={{ borderColor: 'var(--border)' }}>
+            <h3 className="font-semibold">{section.name}</h3>
+            <ReportMetrics items={[
+              { label: 'Bullets', value: section.bulletCount },
+              { label: 'Need an edit', value: section.needsAttention },
+              { label: 'Show scope', value: section.withScope },
+              { label: 'Show an outcome', value: section.withOutcome },
+            ]} />
+          </div>
+        ))}
+      </div>
+    </ReportPanel>
+  )
+}
 
-  const ratingColor = overallRating?.includes('A') ? '#10b981' : overallRating?.includes('B') ? '#3b82f6'
-    : overallRating?.includes('C') ? '#f59e0b' : '#ef4444'
+export function RoastResult({ result, previous, onReset }) {
+  const [active, setActive] = useState('plan')
+  const detail = result.detailedReview
+  const summary = detail?.summary
+  const priorities = detail?.priorities?.length ? detail.priorities : (result.findings?.length ? result.findings : (result.mistakesBreakdown || []).map((title, index) => ({
+    id: String(index), title, action: result.improvementTips?.[index],
+  })))
+  const sections = [['plan', 'Revision plan']]
+  if (detail?.bullets?.length) sections.push(['bullets', 'Bullet review'])
+  if (detail?.sections?.length) sections.push(['sections', 'Section coverage'])
+  const baseline = previous?.detailedReview?.summary
+
+  function exportLines() {
+    return [
+      'Nyris resume writing review',
+      result.targetRole ? 'Target role — ' + result.targetRole : undefined,
+      result.overallRating ? 'Writing grade — ' + result.overallRating : undefined,
+      result.verdict,
+      result.funnyRoast || result.seriousFeedback,
+      '',
+      'Writing breakdown',
+      ...(result.rubric || []).map(row => row.label + ' — ' + row.score + '%. ' + row.summary),
+      '',
+      'Revision plan',
+      ...priorities.map(item => item.title + ' — ' + (item.detail || item.action || 'Review this part of your resume.')),
+      '',
+      'Bullet review',
+      ...(detail?.bullets || []).flatMap(bullet => [
+        'Bullet ' + bullet.index + ' · ' + bullet.section + ' — ' + (bulletStatus[bullet.status] || bullet.status),
+        bullet.text,
+        ...(bullet.issues || []).map(issue => '  ' + issue.title + ' — ' + issue.detail),
+        bullet.coaching?.question,
+        bullet.coaching?.scaffold,
+        '',
+      ]),
+      ...(detail?.sections?.length ? [
+        'Section coverage',
+        ...detail.sections.map(section => `${section.name} — ${section.bulletCount} bullets, ${section.needsAttention} needing an edit, ${section.withScope} with scope, ${section.withOutcome} with an outcome.`),
+        '',
+      ] : []),
+      result.coachingNote ? 'AI coaching note — ' + result.coachingNote : undefined,
+    ]
+  }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-      {/* Rating */}
-      <div className="card p-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Overall Rating</p>
-        <div className="text-6xl font-black mb-2" style={{ color: ratingColor, fontFamily: 'DM Sans' }}>{overallRating}</div>
-        {verdict && (
-          <p className="text-base italic" style={{ color: 'var(--text-secondary)' }}>"{verdict}"</p>
-        )}
-      </div>
-
-      {/* Funny Roast */}
-      <div className="card p-6" style={{ border: '1px solid rgba(245,158,11,0.25)', background: 'rgba(245,158,11,0.04)' }}>
-        <div className="flex items-center gap-2 mb-4">
-          <Flame size={16} style={{ color: '#f59e0b' }} />
-          <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>The Roast 🔥</h3>
-        </div>
-        <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>{funnyRoast}</p>
-      </div>
-
-      {/* Serious Feedback */}
-      <div className="card p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Star size={16} style={{ color: '#3b82f6' }} />
-          <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Honest Assessment</h3>
-        </div>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{seriousFeedback}</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-5">
-        {/* Mistakes */}
-        {mistakesBreakdown?.length > 0 && (
-          <div className="card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <AlertCircle size={16} style={{ color: '#ef4444' }} />
-              <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Mistakes Found</h3>
-            </div>
-            <ul className="space-y-2">
-              {mistakesBreakdown.map((m, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <span className="text-red-400 shrink-0 mt-0.5 font-bold">{i + 1}.</span> {m}
-                </li>
-              ))}
-            </ul>
+    <div className="space-y-3 sm:space-y-5">
+      <section className="card space-y-3 p-3.5 sm:space-y-4 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="break-words text-base font-semibold sm:text-xl">{result.targetRole ? 'Writing review for ' + result.targetRole : 'Resume writing review'}</h2>
+            {result.verdict && <p className="mt-2 font-medium">{result.verdict}</p>}
+            {(result.funnyRoast || result.seriousFeedback) && (
+              <p className="mt-2 flex gap-2 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {result.tone === 'playful' && <Flame size={16} className="mt-0.5 shrink-0 text-amber-500" aria-hidden="true" />}
+                {result.funnyRoast || result.seriousFeedback}
+              </p>
+            )}
           </div>
-        )}
+          {result.overallRating && <div className="rounded-lg border px-2 py-1.5 text-center sm:px-4 sm:py-3" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Writing grade</p>
+            <p className="text-xl font-bold sm:text-3xl" style={{ color: 'var(--accent-blue)' }}>{result.overallRating}</p>
+          </div>}
+        </div>
+        {summary && <ReportMetrics items={[
+          { label: 'Bullets analyzed', value: summary.bulletsAnalyzed },
+          { label: 'Need an edit', value: summary.needsAttention, detail: baseline ? 'Previous run ' + baseline.needsAttention + ' of ' + baseline.bulletsAnalyzed : '' },
+          { label: 'Scope shown', value: summary.withScope },
+          { label: 'Outcome shown', value: summary.withOutcome },
+          { label: 'Numbers present', value: summary.withNumbers },
+        ]} />}
+      </section>
 
-        {/* Tips */}
-        {improvementTips?.length > 0 && (
-          <div className="card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb size={16} style={{ color: '#10b981' }} />
-              <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>How to Improve</h3>
-            </div>
-            <ul className="space-y-2">
-              {improvementTips.map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={13} className="mt-0.5 shrink-0" style={{ color: '#10b981' }} /> {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <ReportNavigation options={sections} active={active} onChange={setActive} />
 
-      <button onClick={onReset} className="btn-secondary w-full justify-center py-3 rounded-xl">
-        <RefreshCw size={15} /> Roast Another Resume
-      </button>
-    </motion.div>
+      {active === 'plan' && <div className="space-y-4">
+        <ReportPanel title="Edits to make next">
+          {priorities.length ? <ol className="mt-4 space-y-3">{priorities.map((item, index) => (
+            <li key={item.id || index} className="rounded-lg border p-2.5 sm:p-4" style={{ borderColor: 'var(--border)' }}>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <h3 className="font-medium">{item.title}</h3>
+                {item.priority && <span className="text-xs font-semibold" style={{ color: 'var(--accent-blue)' }}>
+                  {item.priority}
+                </span>}
+              </div>
+              {item.evidence && <blockquote className="mt-2 break-words border-l-2 border-blue-500/40 pl-3 text-sm">{item.evidence}</blockquote>}
+              {(item.detail || item.action) && <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.detail || item.action}</p>}
+            </li>
+          ))}</ol> : <p className="mt-3 text-sm" style={{ color: 'var(--text-secondary)' }}>Review dates, links, and outcomes before applying.</p>}
+        </ReportPanel>
+        {!!result.rubric?.length && (
+          <ReportPanel title="Writing breakdown">
+            <div className="mt-4"><ReportMetrics items={result.rubric.map(row => ({ label: row.label, value: row.score + '%', detail: row.summary }))} /></div>
+          </ReportPanel>
+        )}
+        {result.evidenceHighlight?.text && <ReportPanel title="Evidence worth keeping">
+          <blockquote className="mt-3 break-words border-l-2 border-emerald-500/50 pl-3 text-sm leading-relaxed">{result.evidenceHighlight.text}</blockquote>
+        </ReportPanel>}
+        {result.coachingNote && <ReportPanel title="AI coaching note" description={result.coachingNote} />}
+        {result.coachingStatus === 'unavailable' && <p role="status" className="text-sm" style={{ color: 'var(--text-secondary)' }}>The writing review is ready. The optional AI note could not be added to this run.</p>}
+      </div>}
+      {active === 'bullets' && <BulletReview bullets={detail.bullets} summary={summary} />}
+      {active === 'sections' && <SectionReview sections={detail.sections} />}
+      <ReportActions onReset={onReset} resetLabel="Edit and review again" filename="Nyris-writing-review.txt" exportLines={exportLines} />
+    </div>
   )
 }

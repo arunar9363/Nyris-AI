@@ -2,6 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .resume-choice {
+    @apply rounded-lg border px-2.5 py-1.5 text-left transition-colors sm:px-3 sm:py-2.5;
+    border-color: var(--border);
+    color: var(--text-primary);
+  }
+
+  .resume-choice:hover {
+    border-color: var(--accent-blue);
+  }
+
+  .resume-choice[aria-pressed="true"] {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, .12);
+  }
+
+  .resume-choice:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+  }
+
+  .resume-error {
+    @apply rounded-lg border px-3 py-2 text-sm;
+    border-color: rgba(239, 68, 68, .32);
+    background: rgba(239, 68, 68, .1);
+    color: #f87171;
+  }
+
+  .light .resume-error { color: #9f1239; }
+
+  .resume-paper-frame {
+    padding: clamp(.65rem, 2.4vw, 2rem);
+    background: var(--bg-secondary);
+  }
+
+  .resume-paper {
+    width: 100%;
+    min-height: 44rem;
+    margin: 0 auto;
+    padding: clamp(1rem, 3.5vw, 2.25rem);
+    background: #fff;
+    color: #171717;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .19);
+    font: .86rem/1.25 "Times New Roman", Georgia, serif;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-paper .paper-name {
+    color: #073483;
+    font-size: clamp(1.65rem, 4vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.08;
+    text-align: center;
+  }
+  .resume-paper address { margin: .32rem 0 1rem; text-align: center; font-style: normal; font-size: .9em; }
+  .resume-paper .paper-contact { color: #174d93; text-decoration: underline; }
+  .resume-paper h3 {
+    margin: .76rem 0 .35rem;
+    border-bottom: 1px solid #777;
+    font-size: 1.02em;
+    font-weight: 700;
+    font-variant-caps: small-caps;
+  }
+  .resume-paper .paper-row { display: flex; justify-content: space-between; gap: .6rem; }
+  .resume-paper .paper-row-main { min-width: 0; }
+  .resume-paper .paper-row-meta { flex: 0 0 auto; max-width: 42%; text-align: right; font-size: .92em; }
+  .resume-paper .paper-entry + .paper-entry { margin-top: .4rem; }
+  .resume-paper ul { padding-left: 1rem; list-style: disc; }
+  .guide-source { @apply mt-3 flex items-center gap-1.5 text-sm font-medium underline underline-offset-4; color: var(--accent-blue); }
+}
+
+.resume-paper[data-layout="modern"] {
+  padding: clamp(1.1rem, 4vw, 2.6rem);
+  font: .86rem/1.48 Arial, sans-serif;
+}
+
+.resume-paper[data-layout="modern"] .paper-identity {
+  border-bottom: 2px solid #155e75;
+  padding-bottom: .45rem;
+  margin-bottom: .85rem;
+}
+
+.resume-paper[data-layout="modern"] .paper-name,
+.resume-paper[data-layout="modern"] address { text-align: left; }
+.resume-paper[data-layout="modern"] .paper-name { color: #155e75; }
+.resume-paper[data-layout="modern"] address { margin-bottom: .2rem; }
+.resume-paper[data-layout="modern"] h3 {
+  border: 0;
+  color: #155e75;
+  margin-top: 1rem;
+  font-size: 1.05em;
+  font-variant-caps: normal;
+}
+.resume-paper[data-layout="modern"] .paper-entry + .paper-entry { margin-top: .65rem; }
+
+.resume-paper[data-layout="creative"] {
+  padding: clamp(.8rem, 2.8vw, 1.55rem);
+  font: .83rem/1.2 "Times New Roman", Georgia, serif;
+}
+.resume-paper[data-layout="creative"] .paper-name {
+  color: #27272a;
+  font-size: clamp(1.34rem, 3.3vw, 1.8rem);
+  text-align: left;
+}
+.resume-paper[data-layout="creative"] address { margin-bottom: .55rem; text-align: left; }
+.resume-paper[data-layout="creative"] h3 { margin: .54rem 0 .2rem; border-color: #a1a1aa; font-variant-caps: normal; text-transform: uppercase; }
+.resume-paper[data-layout="creative"] .paper-entry + .paper-entry { margin-top: .17rem; }
+
 :root {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -59,6 +167,31 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
+@media (max-width: 639px) {
+  :root {
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-size: .875rem;
+    line-height: 1.5;
+  }
+
+  .resume-paper[data-layout] {
+    min-height: 0;
+    padding: .75rem;
+    font-size: .75rem;
+  }
+
+  .resume-paper[data-layout] .paper-name {
+    font-size: 1.25rem;
+  }
+
+  .resume-paper[data-layout] address {
+    margin-bottom: .6rem;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -73,6 +206,10 @@ body {
 
 /* Utility classes */
 @layer components {
+  .page-spacing {
+    @apply px-3 py-5 sm:px-4 sm:py-10;
+  }
+
   .glass {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
@@ -93,7 +230,7 @@ body {
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition-all duration-200;
+    @apply inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold text-white transition-all duration-200 sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm;
     background: linear-gradient(135deg, #2563eb, #7c3aed);
     box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
   }
@@ -108,7 +245,7 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200;
+    @apply inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-all duration-200 sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm;
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border);
@@ -120,7 +257,7 @@ body {
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200;
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-200 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm;
     color: var(--text-secondary);
   }
 
@@ -130,7 +267,7 @@ body {
   }
 
   .input {
-    @apply w-full px-4 py-3 rounded-xl text-sm font-medium outline-none transition-all duration-200;
+    @apply w-full rounded-lg px-3 py-2 text-base font-medium outline-none transition-all duration-200 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm;
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border);
