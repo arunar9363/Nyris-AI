@@ -5,6 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: 'rgb(var(--accent-blue-rgb) / <alpha-value>)',
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -28,8 +29,7 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"DM Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Inter"', 'system-ui', 'sans-serif'],
+        sans: ['"Source Sans 3"', '"Segoe UI"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       animation: {
@@ -49,7 +49,7 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-gradient': 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
+        'hero-gradient': 'var(--gradient-hero)',
         'card-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))',
         'shimmer-gradient': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)',
       },

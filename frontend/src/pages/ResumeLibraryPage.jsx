@@ -51,7 +51,7 @@ export default function ResumeLibraryPage() {
             <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{profile.intro}</p>
           </div>
           <ul className="space-y-1.5 text-sm sm:space-y-3" style={{ color: 'var(--text-secondary)' }}>
-            {profile.priorities.map(item => <li key={item} className="flex items-start gap-2"><CheckCircle2 size={15} className="mt-0.5 shrink-0 text-blue-500" aria-hidden="true" />{item}</li>)}
+            {profile.priorities.map(item => <li key={item} className="flex items-start gap-2"><CheckCircle2 size={15} className="mt-0.5 shrink-0 text-brand" aria-hidden="true" />{item}</li>)}
           </ul>
           <div>
             <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Suggested order</h3>

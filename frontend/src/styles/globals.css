@@ -15,7 +15,7 @@
 
   .resume-choice[aria-pressed="true"] {
     border-color: var(--accent-blue);
-    background: rgba(59, 130, 246, .12);
+    background: rgb(var(--accent-blue-rgb) / .12);
   }
 
   .resume-choice:focus-visible {
@@ -111,40 +111,47 @@
 .resume-paper[data-layout="creative"] .paper-entry + .paper-entry { margin-top: .17rem; }
 
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-card: #1e293b;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: rgba(148, 163, 184, 0.12);
-  --border-hover: rgba(148, 163, 184, 0.25);
-  --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
+  --bg-primary: #181c25;
+  --bg-secondary: #202631;
+  --bg-card: #252c39;
+  --bg-nav: rgba(24, 28, 37, 0.88);
+  --text-primary: #f0f2f6;
+  --text-secondary: #b0bacb;
+  --text-muted: #95a0b3;
+  --border: rgba(176, 186, 203, 0.13);
+  --border-hover: rgba(176, 186, 203, 0.27);
+  --accent-blue-rgb: 158 178 239;
+  --accent-purple-rgb: 192 176 233;
+  --accent-blue: rgb(var(--accent-blue-rgb));
+  --accent-purple: rgb(var(--accent-purple-rgb));
+  --brand-fill: #5e6fc2;
+  --brand-fill-hover: #5263b1;
   --accent-cyan: #06b6d4;
   --accent-green: #10b981;
   --accent-orange: #f59e0b;
-  --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-  --gradient-card: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.05));
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.15);
+  --gradient-hero: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  --gradient-card: linear-gradient(135deg, rgb(var(--accent-blue-rgb) / .06), rgb(var(--accent-purple-rgb) / .03));
+  --shadow-card: 0 4px 24px rgba(10, 15, 25, 0.25);
+  --shadow-glow: 0 0 40px rgb(var(--accent-blue-rgb) / .1);
   --radius: 12px;
   --radius-lg: 18px;
 }
 
 .light {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #f1f5f9;
+  --bg-primary: #f7f8f6;
+  --bg-secondary: #edf0f4;
   --bg-card: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --border: rgba(15, 23, 42, 0.1);
-  --border-hover: rgba(15, 23, 42, 0.2);
-  --gradient-hero: linear-gradient(135deg, #eff6ff 0%, #eef2ff 50%, #f0fdf4 100%);
-  --gradient-card: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(139,92,246,0.03));
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.1);
+  --bg-nav: rgba(255, 255, 255, 0.95);
+  --text-primary: #202736;
+  --text-secondary: #465268;
+  --text-muted: #5b6677;
+  --border: rgba(32, 39, 54, 0.11);
+  --border-hover: rgba(32, 39, 54, 0.22);
+  --accent-blue-rgb: 65 86 162;
+  --accent-purple-rgb: 105 85 144;
+  --brand-fill: #4357a6;
+  --brand-fill-hover: #374a93;
+  --shadow-card: 0 4px 24px rgba(30, 39, 55, 0.07);
 }
 
 * {
@@ -158,7 +165,6 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -199,7 +205,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
 
 /* Selection */
-::selection { background: rgba(59, 130, 246, 0.3); color: #fff; }
+::selection { background: var(--brand-fill); color: #fff; }
 
 /* Focus ring */
 :focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
@@ -231,13 +237,14 @@ body {
 
   .btn-primary {
     @apply inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold text-white transition-all duration-200 sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    background: var(--brand-fill);
+    box-shadow: 0 4px 15px rgba(17, 22, 37, 0.16);
   }
 
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    background: var(--brand-fill-hover);
+    box-shadow: 0 6px 20px rgba(17, 22, 37, 0.22);
   }
 
   .btn-primary:active {
@@ -275,7 +282,7 @@ body {
 
   .input:focus {
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgb(var(--accent-blue-rgb) / .15);
   }
 
   .input::placeholder {
@@ -288,13 +295,12 @@ body {
   }
 
   .section-heading {
-    font-family: 'DM Sans', sans-serif;
     @apply text-3xl font-bold tracking-tight;
     color: var(--text-primary);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

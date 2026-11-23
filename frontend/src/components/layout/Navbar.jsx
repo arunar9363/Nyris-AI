@@ -36,15 +36,13 @@ export default function Navbar() {
   }
 
   const isDark = theme === 'dark'
-  const navBg = isDark ? 'rgba(15,23,42,0.88)' : 'rgba(255,255,255,0.95)'
-  const navBorder = isDark ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.1)'
 
   return (
     <nav className="sticky top-0 z-50 border-b" style={{
-      background: navBg,
+      background: 'var(--bg-nav)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      borderColor: navBorder,
+      borderColor: 'var(--border)',
       transition: 'background 0.3s ease, border-color 0.3s ease',
     }}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -75,15 +73,14 @@ export default function Navbar() {
                   {label}
                   {locked && (
                     <span className="ml-1 text-[9px] px-1 py-0.5 rounded font-bold uppercase tracking-wider"
-                      style={{ background: 'rgba(139,92,246,0.2)', color: 'var(--accent-purple)' }}>
+                      style={{ background: 'rgb(var(--accent-purple-rgb) / .16)', color: 'var(--accent-purple)' }}>
                       PRO
                     </span>
                   )}
                   {active && (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute inset-0 rounded-lg -z-10"
-                      style={{ background: 'rgba(59,130,246,0.1)' }}
+                      className="absolute inset-0 rounded-lg -z-10 bg-brand/10"
                     />
                   )}
                 </Link>
@@ -113,11 +110,11 @@ export default function Navbar() {
                   onClick={() => { setMobileOpen(false); setUserMenuOpen(open => !open) }}
                   aria-label="Account menu"
                   aria-expanded={userMenuOpen}
-                  className="flex h-10 items-center gap-1 rounded-lg border px-2 transition-all duration-200 hover:border-blue-500/40 sm:h-auto sm:gap-2 sm:rounded-xl sm:px-3 sm:py-1.5"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}
+                  className="flex h-10 items-center gap-1 rounded-lg border border-[var(--border)] px-2 transition-all duration-200 hover:border-brand/40 sm:h-auto sm:gap-2 sm:rounded-xl sm:px-3 sm:py-1.5"
+                  style={{ background: 'var(--bg-secondary)' }}
                 >
                   <div className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold sm:h-6 sm:w-6 sm:text-xs"
-                    style={{ background: 'linear-gradient(135deg,#2563eb,#7c3aed)', color: '#fff' }}>
+                    style={{ background: 'var(--brand-fill)', color: '#fff' }}>
                     {user?.name?.[0]?.toUpperCase()}
                   </div>
                   <span className="text-sm font-medium hidden sm:block" style={{ color: 'var(--text-primary)' }}>
@@ -138,12 +135,12 @@ export default function Navbar() {
                     >
                       <div className="p-1">
                         <Link to="/dashboard" onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-blue-500/10"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-brand/10"
                           style={{ color: 'var(--text-primary)' }}>
                           <LayoutDashboard size={14} /> Dashboard
                         </Link>
                         <Link to="/history" onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-blue-500/10"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-brand/10"
                           style={{ color: 'var(--text-primary)' }}>
                           <FileText size={14} /> My Resumes
                         </Link>
@@ -188,7 +185,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="absolute inset-x-0 top-full overflow-hidden border-b border-t shadow-lg lg:hidden"
-            style={{ borderColor: navBorder, background: isDark ? 'var(--bg-card)' : '#ffffff' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
           >
             <div className="mx-auto grid max-h-[calc(100dvh-3rem)] max-w-7xl grid-cols-2 gap-1 overflow-y-auto px-3 py-2 sm:max-h-[calc(100dvh-4rem)] sm:px-6 sm:py-3">
               {navLinks.map(({ label, path, icon: Icon, free }) => {
@@ -202,7 +199,7 @@ export default function Navbar() {
                     className="flex min-h-10 min-w-0 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors sm:text-sm"
                     style={{
                       color: location.pathname === path ? 'var(--accent-blue)' : 'var(--text-secondary)',
-                      background: location.pathname === path ? 'rgba(59,130,246,0.1)' : 'transparent',
+                      background: location.pathname === path ? 'rgb(var(--accent-blue-rgb) / .1)' : 'transparent',
                     }}
                   >
                     <Icon size={14} className="shrink-0" aria-hidden="true" />

@@ -54,8 +54,8 @@ export default function HomePage() {
         <h2 className="text-lg font-semibold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>Resume tools</h2>
         <div className="mt-2.5 grid gap-2 min-[360px]:grid-cols-2 sm:mt-4 sm:gap-3 lg:grid-cols-4">
           {tools.map(({ name, detail, path, icon: Icon }) => (
-            <Link key={path} to={path} className="card block min-w-0 p-3 hover:border-blue-500/50 sm:p-5">
-              <Icon size={16} className="mb-2 text-blue-500 sm:mb-3 sm:h-[21px] sm:w-[21px]" aria-hidden="true" />
+            <Link key={path} to={path} className="card block min-w-0 p-3 hover:border-brand/50 sm:p-5">
+              <Icon size={16} className="mb-2 text-brand sm:mb-3 sm:h-[21px] sm:w-[21px]" aria-hidden="true" />
               <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{name}</h3>
               <p className="mt-1 text-[13px] leading-relaxed sm:mt-2 sm:text-sm sm:leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{detail}</p>
             </Link>

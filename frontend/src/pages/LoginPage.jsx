@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="bg-mesh relative flex min-h-screen items-center justify-center px-3 py-5 sm:px-4 sm:py-0">
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(59,130,246,0.1), transparent)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgb(var(--accent-blue-rgb) / .06), transparent)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -47,7 +47,7 @@ export default function LoginPage() {
             <Link to="/" className="mb-2 inline-block sm:mb-4">
               <img src={theme === 'dark' ? logoDark : logoLight} alt="Nyris" className="mx-auto h-6 w-auto sm:h-9" />
             </Link>
-            <h1 className="mb-1 text-xl font-bold sm:text-2xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+            <h1 className="mb-1 text-xl font-bold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>
               Welcome back
             </h1>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>

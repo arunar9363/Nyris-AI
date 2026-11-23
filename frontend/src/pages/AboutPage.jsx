@@ -104,11 +104,11 @@ function FeedbackForm({ onNewFeedback }) {
     <div className="card p-4 sm:p-8">
       <div className="mb-4 flex items-center gap-2 sm:mb-6 sm:gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 sm:rounded-2xl"
-          style={{ background: 'rgba(59,130,246,0.12)' }}>
+          style={{ background: 'rgb(var(--accent-blue-rgb) / .12)' }}>
           <MessageSquare size={18} style={{ color: 'var(--accent-blue)' }} />
         </div>
         <div>
-          <h3 className="text-base font-bold sm:text-lg" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+          <h3 className="text-base font-bold sm:text-lg" style={{ color: 'var(--text-primary)' }}>
             Share Your Feedback
           </h3>
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -255,11 +255,11 @@ function PublicFeedbackList({ feedbacks }) {
     <div className="space-y-3 sm:space-y-4">
       <div className="mb-3 flex flex-wrap items-center gap-2 sm:mb-6">
         <ThumbsUp size={16} style={{ color: 'var(--accent-blue)' }} />
-        <h3 className="font-bold text-lg" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+        <h3 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>
           Community Feedback
         </h3>
         <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-          style={{ background: 'rgba(59,130,246,0.12)', color: 'var(--accent-blue)' }}>
+          style={{ background: 'rgb(var(--accent-blue-rgb) / .12)', color: 'var(--accent-blue)' }}>
           {feedbacks.length} {feedbacks.length === 1 ? 'review' : 'reviews'}
         </span>
       </div>
@@ -277,7 +277,7 @@ function PublicFeedbackList({ feedbacks }) {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                    style={{ background: 'linear-gradient(135deg,#2563eb,#7c3aed)' }}>
+                    style={{ background: 'var(--brand-fill)' }}>
                     {(fb.name || 'U')[0].toUpperCase()}
                   </div>
                   <div>
@@ -344,13 +344,13 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="relative overflow-hidden px-3 py-8 text-center sm:px-4 sm:py-24">
         <div className="absolute inset-0 bg-mesh" />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(59,130,246,0.1), transparent)' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgb(var(--accent-blue-rgb) / .06), transparent)' }} />
         <motion.div initial="hidden" animate="show" variants={container} className="relative z-10 max-w-3xl mx-auto">
           <motion.div variants={fadeUp} className="mb-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold sm:mb-6 sm:gap-2 sm:px-3 sm:py-1.5"
-            style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.25)', color: '#60a5fa' }}>
+            style={{ background: 'rgb(var(--accent-blue-rgb) / .1)', borderColor: 'rgb(var(--accent-blue-rgb) / .25)', color: 'var(--accent-blue)' }}>
             <Sparkles size={12} /> About Nyris AI
           </motion.div>
-          <motion.h1 variants={fadeUp} className="mb-3 text-[1.75rem] font-bold leading-tight sm:mb-6 sm:text-5xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+          <motion.h1 variants={fadeUp} className="mb-3 text-[1.75rem] font-bold leading-tight sm:mb-6 sm:text-5xl" style={{ color: 'var(--text-primary)' }}>
             Built for Job Seekers.<br />
             <span className="text-gradient">Powered by Groq AI.</span>
           </motion.h1>
@@ -389,10 +389,10 @@ export default function AboutPage() {
               {solutions.map(({ icon: Icon, title, desc }) => (
                 <motion.div key={title} variants={fadeUp} className="card p-3 sm:p-6">
                   <div className="mb-2 flex h-7 w-7 items-center justify-center rounded-lg sm:mb-4 sm:h-10 sm:w-10 sm:rounded-2xl"
-                    style={{ background: 'rgba(59,130,246,0.1)' }}>
+                    style={{ background: 'rgb(var(--accent-blue-rgb) / .1)' }}>
                     <Icon size={14} className="sm:h-[18px] sm:w-[18px]" style={{ color: 'var(--accent-blue)' }} />
                   </div>
-                  <h3 className="mb-1 text-sm font-bold sm:mb-2 sm:text-base" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>{title}</h3>
+                  <h3 className="mb-1 text-sm font-bold sm:mb-2 sm:text-base" style={{ color: 'var(--text-primary)' }}>{title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
                 </motion.div>
               ))}
@@ -420,8 +420,8 @@ export default function AboutPage() {
               <motion.div variants={fadeUp} className="card p-3 sm:p-6">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm sm:h-9 sm:w-9 sm:rounded-xl sm:text-lg"
-                    style={{ background: 'rgba(59,130,246,0.1)' }}>🎓</div>
-                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    style={{ background: 'rgb(var(--accent-blue-rgb) / .1)' }}>🎓</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                     Students and New Graduates
                   </span>
                 </div>
@@ -434,8 +434,8 @@ export default function AboutPage() {
               <motion.div variants={fadeUp} className="card p-3 sm:p-6">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm sm:h-9 sm:w-9 sm:rounded-xl sm:text-lg"
-                    style={{ background: 'rgba(139,92,246,0.1)' }}>💼</div>
-                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                    style={{ background: 'rgb(var(--accent-purple-rgb) / .1)' }}>💼</div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                     The Career Switcher
                   </span>
                 </div>
@@ -452,7 +452,7 @@ export default function AboutPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm sm:h-9 sm:w-9 sm:rounded-xl sm:text-lg"
                     style={{ background: 'rgba(16,185,129,0.1)' }}>⚡</div>
-                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                     The Mass Applicant
                   </span>
                 </div>
@@ -466,7 +466,7 @@ export default function AboutPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm sm:h-9 sm:w-9 sm:rounded-xl sm:text-lg"
                     style={{ background: 'rgba(245,158,11,0.1)' }}>🔍</div>
-                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'DM Sans' }}>
+                  <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                     The Self-Doubter
                   </span>
                 </div>
@@ -497,7 +497,7 @@ export default function AboutPage() {
                     <a href="https://www.linkedin.com/in/arun-pratap-singh-944491292" target="_blank" rel="noreferrer"
                       aria-label="Arun Pratap Singh on LinkedIn"
                       className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:-translate-y-0.5"
-                      style={{ background: 'rgba(59,130,246,0.12)', color: 'var(--accent-blue)' }}>
+                      style={{ background: 'rgb(var(--accent-blue-rgb) / .12)', color: 'var(--accent-blue)' }}>
                       <Linkedin size={15} />
                     </a>
                     <a href="https://github.com/arunar9363" target="_blank" rel="noreferrer"
@@ -516,7 +516,7 @@ export default function AboutPage() {
                 </div>
 
                 <div className="flex-1 min-w-0 w-full">
-                  <h3 className="mb-1 text-lg font-bold sm:text-2xl" style={{ fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>
+                  <h3 className="mb-1 text-lg font-bold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>
                     Arun Pratap Singh
                   </h3>
                   <p className="mb-2 text-[13px] font-medium sm:mb-5 sm:text-sm" style={{ color: 'var(--accent-blue)' }}>

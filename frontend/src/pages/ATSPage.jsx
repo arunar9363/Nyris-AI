@@ -66,7 +66,7 @@ function JobEvidence({ terms, manualChecks }) {
                   </p>
                 </div>
                 <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>{priorityLabel[item.priority] || priorityLabel.mentioned}</p>
-                {item.excerpt && <blockquote className="mt-3 break-words border-l-2 border-blue-500/40 pl-3 text-sm leading-relaxed">
+                {item.excerpt && <blockquote className="mt-3 break-words border-l-2 border-brand/40 pl-3 text-sm leading-relaxed">
                   {item.section && <span className="mb-1 block text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>{item.section}</span>}
                   {item.excerpt}
                 </blockquote>}

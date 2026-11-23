@@ -30,7 +30,7 @@ export function ATSCircle({ score = 0, size = 140, label = 'Readiness' }) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="font-display text-xl font-bold sm:text-3xl"
+            className="text-xl font-bold sm:text-3xl"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.4 }}
@@ -141,12 +141,12 @@ export function FileDropzone({ onDrop, file, onRemove, name = 'resume', formats 
       className={`relative flex cursor-pointer items-center gap-2.5 rounded-xl border-2 border-dashed px-3 py-3 transition-all duration-200 sm:flex-col sm:justify-center sm:gap-3 sm:rounded-2xl sm:px-6 sm:py-10 ${isDragActive ? 'scale-[1.01]' : ''}`}
       style={{
         borderColor: isDragActive ? 'var(--accent-blue)' : 'var(--border)',
-        background: isDragActive ? 'rgba(59,130,246,0.06)' : 'var(--bg-secondary)',
+        background: isDragActive ? 'rgb(var(--accent-blue-rgb) / .06)' : 'var(--bg-secondary)',
       }}
     >
       <input {...getInputProps()} />
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 sm:rounded-2xl"
-        style={{ background: 'rgba(59,130,246,0.1)' }}>
+        style={{ background: 'rgb(var(--accent-blue-rgb) / .1)' }}>
         <Upload size={16} className="sm:h-[22px] sm:w-[22px]" style={{ color: 'var(--accent-blue)' }} />
       </div>
       <div className="min-w-0 sm:text-center">
@@ -174,7 +174,7 @@ export function ProgressBar({ value = 0, label = '', stage = '' }) {
       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
         <motion.div
           className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }}
+          style={{ background: 'var(--brand-fill)' }}
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ duration: 0.6, ease: 'easeOut' }}

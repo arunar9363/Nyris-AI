@@ -57,7 +57,7 @@ export default function HistoryPage() {
       ) : visible.length ? (
         <ul className="space-y-2 sm:space-y-3">
           {visible.map(item => <li key={item._id} className="card flex items-center gap-1.5 p-2.5 sm:gap-3 sm:p-4">
-            <FileText size={16} className="shrink-0 text-blue-500 sm:h-[19px] sm:w-[19px]" aria-hidden="true" />
+            <FileText size={16} className="shrink-0 text-brand sm:h-[19px] sm:w-[19px]" aria-hidden="true" />
             <div className="min-w-0 flex-1">
               <Link className="block truncate font-medium hover:underline" to={'/history/' + item._id} style={{ color: 'var(--text-primary)' }}>{item.title}</Link>
               <div className="mt-1 flex flex-wrap gap-x-3 text-xs" style={{ color: 'var(--text-muted)' }}>

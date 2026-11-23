@@ -44,7 +44,7 @@ function BulletReview({ bullets, summary }) {
               <h3 className="text-sm font-semibold">{bullet.section} · Bullet {bullet.index}</h3>
               <span className={'text-xs font-semibold ' + (bullet.status === 'needs-work' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400')}>{bulletStatus[bullet.status] || bullet.status}</span>
             </div>
-            <blockquote className="break-words border-l-2 border-blue-500/50 pl-3 text-sm leading-relaxed">{bullet.text}</blockquote>
+            <blockquote className="break-words border-l-2 border-brand/50 pl-3 text-sm leading-relaxed">{bullet.text}</blockquote>
             <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
               {[
                 actionLabels[bullet.action],
@@ -179,7 +179,7 @@ export function RoastResult({ result, previous, onReset }) {
                   {item.priority}
                 </span>}
               </div>
-              {item.evidence && <blockquote className="mt-2 break-words border-l-2 border-blue-500/40 pl-3 text-sm">{item.evidence}</blockquote>}
+              {item.evidence && <blockquote className="mt-2 break-words border-l-2 border-brand/40 pl-3 text-sm">{item.evidence}</blockquote>}
               {(item.detail || item.action) && <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.detail || item.action}</p>}
             </li>
           ))}</ol> : <p className="mt-3 text-sm" style={{ color: 'var(--text-secondary)' }}>Review dates, links, and outcomes before applying.</p>}

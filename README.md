@@ -24,7 +24,7 @@ The ATS score is a Nyris estimate based on the supplied resume and job descripti
 
 ## Run locally
 
-Use Node.js 22.3 or newer, npm, and a running MongoDB instance. Run the API and frontend in separate terminals. The commands below use PowerShell. On macOS or Linux, use `npm` in place of `npm.cmd`.
+Use Node.js 22.x with version 22.3 or later, npm, and a running MongoDB instance. Run the API and frontend in separate terminals. The commands below use PowerShell. On macOS or Linux, use `npm` in place of `npm.cmd`.
 
 ### Start the API
 
@@ -99,6 +99,19 @@ The backend suite covers uploads, resume import, preview and export rendering, A
 2. On the frontend host, run `npm ci` and `npm run build` from `frontend/`. Publish `dist/`. For a separately hosted API, set `VITE_API_URL` to its full API base, such as `https://api.example.com/api`, before building.
 3. Configure the static host to serve `index.html` for client-side routes such as `/builder` and `/history`. With a same-origin API, forward `/api/*` to Express before the frontend route fallback.
 4. Check `GET /api/health` for API liveness and `GET /api/ready` for MongoDB readiness. The readiness response also shows whether a Groq key is configured.
+
+### Render backend
+
+| Setting | Value |
+| --- | --- |
+| Root Directory | `backend` |
+| Build Command | `npm ci --include=optional` |
+| Start Command | `npm start` |
+| Health Check Path | `/api/ready` |
+
+The backend's Node.js version range selects Node 22.x. Any `NODE_VERSION` configured in the Render dashboard takes precedence. PDF export runs server-side without a browser install. [Render Node.js versions](https://render.com/docs/node-version)
+
+For `ENOTFOUND` during MongoDB startup, confirm the Atlas cluster is active and compare the host in Render's `MONGODB_URI` with the cluster's current connection details. If SRV resolution fails for the active cluster, copy its standard `mongodb://` connection string from Atlas, preserve the database name and connection options, and save the updated variable with a deploy. [Atlas connection troubleshooting](https://www.mongodb.com/docs/atlas/troubleshoot-connection/) · [Render environment settings](https://render.com/docs/configure-environment-variables)
 
 ## Project structure
 
