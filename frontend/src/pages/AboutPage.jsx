@@ -147,7 +147,7 @@ function FeedbackForm({ onNewFeedback }) {
               <div>
                 <label className="label flex items-center gap-1">
                   <User2 size={11} /> Name
-                  <span className="text-[10px] normal-case font-normal ml-1" style={{ color: 'var(--text-muted)' }}>(optional)</span>
+                  <span className="text-[10px] normal-case font-normal ml-1" style={{ color: 'var(--text-muted)' }}></span>
                 </label>
                 <input
                   value={form.name}
