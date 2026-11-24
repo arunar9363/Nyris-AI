@@ -153,7 +153,7 @@ function FeedbackForm({ onNewFeedback }) {
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   className="input"
-                  placeholder="Your name (or stay anonymous)"
+                  placeholder="Your name"
                 />
               </div>
               <div>
