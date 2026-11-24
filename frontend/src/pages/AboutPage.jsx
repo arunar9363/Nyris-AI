@@ -346,10 +346,10 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-mesh" />
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgb(var(--accent-blue-rgb) / .06), transparent)' }} />
         <motion.div initial="hidden" animate="show" variants={container} className="relative z-10 max-w-3xl mx-auto">
-          <motion.div variants={fadeUp} className="mb-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold sm:mb-6 sm:gap-2 sm:px-3 sm:py-1.5"
+          {/* <motion.div variants={fadeUp} className="mb-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold sm:mb-6 sm:gap-2 sm:px-3 sm:py-1.5"
             style={{ background: 'rgb(var(--accent-blue-rgb) / .1)', borderColor: 'rgb(var(--accent-blue-rgb) / .25)', color: 'var(--accent-blue)' }}>
           
-          </motion.div>
+          </motion.div> */}
           <motion.h1 variants={fadeUp} className="mb-3 text-[1.75rem] font-bold leading-tight sm:mb-6 sm:text-5xl" style={{ color: 'var(--text-primary)' }}>
             Built for Job Seekers.<br />
             <span className="text-gradient">Powered by Groq AI.</span>
@@ -366,7 +366,7 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={container}>
             <motion.div variants={fadeUp} className="mb-2 flex items-center gap-2 sm:mb-4 sm:gap-3">
-              <AlertCircle size={20} style={{ color: '#ef4444' }} />
+        
               <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: '#ef4444' }}>The Problem</p>
             </motion.div>
             <motion.h2 variants={fadeUp} className="section-heading mb-2 text-xl sm:mb-4 sm:text-4xl">Preparing a readable resume</motion.h2>
