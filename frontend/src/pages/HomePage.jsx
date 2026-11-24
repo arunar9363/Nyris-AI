@@ -1,19 +1,17 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BarChart3, FileText, Flame, Pause, Play, Sparkles } from 'lucide-react'
+import { ArrowRight, BarChart3, FileEdit, FileText, Flame } from 'lucide-react'
 import SampleResume from '../components/SampleResume'
 import { getResumeProfile, resumeProfiles } from '../data/resumeGuide'
 
 const tools = [
   { name: 'Resume Builder', detail: 'Format the experience you enter in an order suited to your profile.', path: '/builder', icon: FileText },
-  { name: 'Job Description Optimizer', detail: 'Tailor an existing resume to a job description using your documented experience.', path: '/optimizer', icon: Sparkles },
+  { name: 'Job Description Optimizer', detail: 'Tailor an existing resume to a job description using your documented experience.', path: '/optimizer', icon: FileEdit },
   { name: 'ATS Checker', detail: 'Audit resume parsing and see how your experience supports job requirements.', path: '/ats', icon: BarChart3 },
   { name: 'Resume Roaster', detail: 'Find weak bullets and learn how to show the scope and results of your work.', path: '/roaster', icon: Flame },
 ]
 
 export default function HomePage() {
   const featured = getResumeProfile('graduate')
-  const [examplesPaused, setExamplesPaused] = useState(false)
 
   return (
     <div>
@@ -47,27 +45,14 @@ export default function HomePage() {
       </section>
 
       <section className="page-spacing mx-auto max-w-6xl sm:px-6">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>Examples by situation</h2>
-          <button type="button" className="resume-choice hidden !p-2 motion-safe:inline-flex"
-            aria-label={examplesPaused ? 'Resume scrolling examples' : 'Pause scrolling examples'}
-            onClick={() => setExamplesPaused(paused => !paused)}>
-            {examplesPaused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
-          </button>
-        </div>
-        <div className="home-examples mt-2.5 sm:mt-4" data-paused={examplesPaused}>
-          <div className="home-examples-track">
-            {[false, true].map(duplicate => (
-              <div key={duplicate ? 'duplicate' : 'original'} className="home-examples-row" aria-hidden={duplicate || undefined}>
-                {resumeProfiles.map(profile => (
-                  <Link key={profile.id} className="resume-choice whitespace-nowrap text-xs sm:text-sm"
-                    tabIndex={duplicate ? -1 : undefined} to={'/resume-library?profile=' + profile.id}>
-                    {profile.name}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
+        <h2 className="text-lg font-semibold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>Examples by situation</h2>
+        <div className="mt-2.5 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
+          {resumeProfiles.map(profile => (
+            <Link key={profile.id} className="resume-choice whitespace-nowrap text-xs sm:text-sm"
+              to={'/resume-library?profile=' + profile.id}>
+              {profile.name}
+            </Link>
+          ))}
         </div>
       </section>
 

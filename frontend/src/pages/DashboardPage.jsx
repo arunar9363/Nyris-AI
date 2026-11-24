@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Sparkles, FileText, BarChart3, Flame, Star, Clock, TrendingUp, ArrowRight } from 'lucide-react'
+import { FileEdit, FileText, BarChart3, Flame, Star, Clock, TrendingUp, ArrowRight } from 'lucide-react'
 import useAuthStore from '../store/authStore'
 import useResumeStore from '../store/resumeStore'
 import { SkeletonCard } from '../components/ui/index'
 
 const QUICK_ACTIONS = [
-  { label: 'Optimize Resume', desc: 'Tailor to a job', icon: Sparkles, path: '/optimizer', color: '#3b82f6', free: true },
+  { label: 'Optimize Resume', desc: 'Tailor to a job', icon: FileEdit, path: '/optimizer', color: '#3b82f6', free: true },
   { label: 'Build Resume', desc: 'Start from scratch', icon: FileText, path: '/builder', color: '#8b5cf6' },
   { label: 'Check ATS Score', desc: 'Analyze your resume', icon: BarChart3, path: '/ats', color: '#06b6d4' },
   { label: 'Roast Resume', desc: 'Honest feedback', icon: Flame, path: '/roaster', color: '#f59e0b' },
@@ -115,7 +115,7 @@ export default function DashboardPage() {
             <FileText size={24} className="mx-auto mb-2 sm:mb-3 sm:h-8 sm:w-8" style={{ color: 'var(--text-muted)' }} />
             <p className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>No resumes yet</p>
             <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>Start with the JD Optimizer</p>
-            <Link to="/optimizer" className="btn-primary inline-flex"><Sparkles size={14} /> Optimize Now</Link>
+            <Link to="/optimizer" className="btn-primary inline-flex">Optimize Now <ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
         ) : (
           <div className="space-y-3">

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Sparkles, Target, TrendingUp, AlertCircle, CheckCircle,
-  Linkedin, Github, Globe, Star, Send, MessageSquare,
+  FileEdit, Target, TrendingUp, AlertCircle, CheckCircle,
+  Linkedin, Github, Globe, Star, Send, MessageSquare, MessageSquarePlus,
   Bug, Lightbulb, Heart, User2, ThumbsUp, AudioLines
 } from 'lucide-react'
 import arunPhoto from '../assets/images/arun.png'
@@ -14,7 +14,7 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } }
 
 const solutions = [
-  { icon: Sparkles, title: 'Job Description Optimizer', desc: 'Tailor your resume wording to the job using your documented experience as the source.' },
+  { icon: FileEdit, title: 'Job Description Optimizer', desc: 'Tailor your resume wording to the job using your documented experience as the source.' },
   { icon: Target, title: 'Keyword Matching', desc: 'Compare the terms in the job description with the text in your resume.' },
   { icon: TrendingUp, title: 'ATS Checker', desc: 'Audit extracted resume text and compare evidence against required and preferred job qualifications.' },
   { icon: CheckCircle, title: 'Resume Layouts', desc: 'Choose a single-column layout and export a text-based PDF, Word document, or plain text.' },
@@ -23,7 +23,7 @@ const solutions = [
 const FEEDBACK_TYPES = [
   { value: 'suggestion', label: 'Suggestion', icon: Lightbulb, color: '#f59e0b' },
   { value: 'bug_report', label: 'Bug Report', icon: Bug, color: '#ef4444' },
-  { value: 'feature_request', label: 'Feature Request', icon: Sparkles, color: '#8b5cf6' },
+  { value: 'feature_request', label: 'Feature Request', icon: MessageSquarePlus, color: '#8b5cf6' },
   { value: 'appreciation', label: 'Appreciation', icon: Heart, color: '#ec4899' },
   { value: 'general', label: 'General', icon: MessageSquare, color: '#3b82f6' },
 ]

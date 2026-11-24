@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Sun, Moon, Menu, X, LogOut, LayoutDashboard,
-  ChevronDown, Sparkles, FileText, BarChart3, Flame, Info
+  ChevronDown, FileEdit, FileText, BarChart3, Flame, Info
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
@@ -11,7 +11,7 @@ import logoDark from '../../assets/logos/logo-dark.png'
 import logoLight from '../../assets/logos/logo-light.png'
 
 const navLinks = [
-  { label: 'Optimizer', path: '/optimizer', icon: Sparkles, free: true },
+  { label: 'Optimizer', path: '/optimizer', icon: FileEdit, free: true },
   { label: 'Builder', path: '/builder', icon: FileText, free: false },
   { label: 'Examples', path: '/resume-library', icon: FileText, free: true },
   { label: 'ATS Checker', path: '/ats', icon: BarChart3, free: false },

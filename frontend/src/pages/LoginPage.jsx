@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, LogIn, Sparkles } from 'lucide-react'
+import { ArrowRight, Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react'
 import useAuthStore from '../store/authStore'
 import logoDark from '../assets/logos/logo-dark.png'
 import logoLight from '../assets/logos/logo-light.png'
@@ -115,7 +115,7 @@ export default function LoginPage() {
           <div className="mt-3 border-t pt-3 text-center sm:mt-4 sm:pt-4" style={{ borderColor: 'var(--border)' }}>
             <Link to="/optimizer" className="text-xs flex items-center justify-center gap-1.5 hover:underline"
               style={{ color: 'var(--text-muted)' }}>
-              <Sparkles size={11} /> Continue without account (Optimizer only)
+              Try the Optimizer as a guest <ArrowRight size={12} aria-hidden="true" />
             </Link>
           </div>
         </div>
