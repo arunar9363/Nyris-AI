@@ -348,7 +348,7 @@ export default function AboutPage() {
         <motion.div initial="hidden" animate="show" variants={container} className="relative z-10 max-w-3xl mx-auto">
           <motion.div variants={fadeUp} className="mb-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold sm:mb-6 sm:gap-2 sm:px-3 sm:py-1.5"
             style={{ background: 'rgb(var(--accent-blue-rgb) / .1)', borderColor: 'rgb(var(--accent-blue-rgb) / .25)', color: 'var(--accent-blue)' }}>
-            <Sparkles size={12} /> About Nyris AI
+          
           </motion.div>
           <motion.h1 variants={fadeUp} className="mb-3 text-[1.75rem] font-bold leading-tight sm:mb-6 sm:text-5xl" style={{ color: 'var(--text-primary)' }}>
             Built for Job Seekers.<br />
