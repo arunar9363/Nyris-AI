@@ -46,13 +46,19 @@ export default function HomePage() {
 
       <section className="page-spacing mx-auto max-w-6xl sm:px-6">
         <h2 className="text-lg font-semibold sm:text-2xl" style={{ color: 'var(--text-primary)' }}>Examples by situation</h2>
-        <div className="mt-2.5 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
-          {resumeProfiles.map(profile => (
-            <Link key={profile.id} className="resume-choice whitespace-nowrap text-xs sm:text-sm"
-              to={'/resume-library?profile=' + profile.id}>
-              {profile.name}
-            </Link>
-          ))}
+        <div className="home-examples mt-2.5 sm:mt-4">
+          <div className="home-examples-track">
+            {[false, true].map(duplicate => (
+              <div key={duplicate ? 'duplicate' : 'original'} className="home-examples-row" aria-hidden={duplicate || undefined}>
+                {resumeProfiles.map(profile => (
+                  <Link key={profile.id} className="resume-choice whitespace-nowrap text-xs sm:text-sm"
+                    tabIndex={duplicate ? -1 : undefined} to={'/resume-library?profile=' + profile.id}>
+                    {profile.name}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
